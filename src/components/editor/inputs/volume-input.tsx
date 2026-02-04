@@ -13,7 +13,7 @@ export function VolumeInput({ volume, setVolume }: VolumeInputProps) {
     volume !== "--" ? padNumber(volume) : volume,
   );
 
-  function handleLocalVolumeKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     // shortcut for entering a continue symbol
     if (e.key === "-") {
       setVolume("--");
@@ -36,7 +36,7 @@ export function VolumeInput({ volume, setVolume }: VolumeInputProps) {
   }
 
   // come back and validate the shit out of this later
-  function handleLocalVolumeChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.value.trim();
     const valueNum = Number(value);
 
@@ -47,7 +47,7 @@ export function VolumeInput({ volume, setVolume }: VolumeInputProps) {
     }
   }
 
-  function handleLocalVolumeBlur() {
+  function handleBlur() {
     const parsedLocalVolume = parseInt(localVolume, 10);
 
     if (isVolumeLevel(parsedLocalVolume)) {
@@ -66,9 +66,9 @@ export function VolumeInput({ volume, setVolume }: VolumeInputProps) {
     <input
       type="text"
       value={localVolume}
-      onKeyDown={handleLocalVolumeKeyDown}
-      onChange={handleLocalVolumeChange}
-      onBlur={handleLocalVolumeBlur}
+      onKeyDown={handleKeyDown}
+      onChange={handleChange}
+      onBlur={handleBlur}
       className="w-6 text-sm text-center font-mono"
       maxLength={2}
       spellCheck={false}
