@@ -1,5 +1,7 @@
 export function Editor({ children }: { children: React.ReactNode }) {
   return (
-    <table className="table-fixed border-collapse border">{children}</table>
+    <div className="h-dvh w-fit overflow-auto">
+      <table className="border-collapse">{children}</table>
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 import type { Duty } from "./audio/duty";
 import type { MusicalNote } from "./audio/notes";
+import type { Rate } from "./audio/rate";
 import type { VolumeLevel } from "./audio/volume";
 
 export type PulseCell = {
@@ -11,7 +12,7 @@ export type PulseCell = {
 
 export type NoiseCell = {
   kind: "noise";
-  rate: string | "--";
+  rate: Rate | "--";
   volume: VolumeLevel | "--";
 };
 

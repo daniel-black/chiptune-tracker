@@ -8,8 +8,8 @@ const columns = [0, 1, 2, 3] as const;
 
 export function EditorRow({ rowIndex }: EditorRowProps) {
   return (
-    <tr>
-      <td className="border text-center font-mono text-xs px-2">
+    <tr className="nth-4:bg-blue-300 border-b hover:bg-amber-100">
+      <td className="border-x text-center font-mono text-xs px-2">
         {rowIndex + 1}
       </td>
       {columns.map((columnIndex) => (

@@ -1,9 +1,14 @@
 import { useState } from "react";
 import type { PulseCell } from "../../../types";
-import { isMusicalNote } from "../../../audio/notes";
+import { isMusicalNote, type MusicalNote } from "../../../audio/notes";
+import { TextInput } from "./text-input";
 
 function isValidPitch(value: string): boolean {
   return /^[a-g]$/i.test(value);
+}
+
+function isValidOctave(value: string): boolean {
+  return /[2-7]/.test(value);
 }
 
 function canBeSharp(pitch: string): boolean {
@@ -63,12 +68,20 @@ export function NoteInput({ note, setNote }: NoteInputProps) {
 
     if (value.length === 2 && isValidPitch(value[0])) {
       const pitch = value[0].toUpperCase();
-      const middleChar = value[1].toLowerCase();
+      const secondChar = value[1].toLowerCase();
+
+      // If the user types "D4", shortcut it to "D-4"
+      if (isValidOctave(secondChar)) {
+        const newNote = `${pitch}-${secondChar}` as MusicalNote;
+        setNote(newNote);
+        setLocalNote(newNote);
+        return;
+      }
 
       if (
-        middleChar === "-" ||
-        (middleChar === "#" && canBeSharp(pitch)) ||
-        (middleChar === "b" && canBeFlat(pitch))
+        secondChar === "-" ||
+        (secondChar === "#" && canBeSharp(pitch)) ||
+        (secondChar === "b" && canBeFlat(pitch))
       ) {
         setLocalNote(value);
         return;
@@ -89,15 +102,22 @@ export function NoteInput({ note, setNote }: NoteInputProps) {
   }
 
   return (
-    <input
-      type="text"
+    <TextInput
       value={localNote}
       onKeyDown={handleKeyDown}
       onChange={handleChange}
       onBlur={handleBlur}
-      className="w-8 text-sm text-center font-mono"
       maxLength={3}
-      spellCheck={false}
     />
+    // <input
+    //   type="text"
+    //   value={localNote}
+    // onKeyDown={handleKeyDown}
+    // onChange={handleChange}
+    // onBlur={handleBlur}
+    //   className="w-8 text-sm text-center font-mono"
+    //   maxLength={3}
+    //   spellCheck={false}
+    // />
   );
 }

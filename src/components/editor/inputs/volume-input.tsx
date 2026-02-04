@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { isVolumeLevel } from "../../../audio/volume";
 import type { Cell } from "../../../types";
+import { TextInput } from "./text-input";
 
 type VolumeInputProps = {
   volume: Cell["volume"];
@@ -63,16 +64,23 @@ export function VolumeInput({ volume, setVolume }: VolumeInputProps) {
   }
 
   return (
-    <input
-      type="text"
+    <TextInput
       value={localVolume}
       onKeyDown={handleKeyDown}
       onChange={handleChange}
       onBlur={handleBlur}
-      className="w-6 text-sm text-center font-mono"
       maxLength={2}
-      spellCheck={false}
     />
+    // <input
+    //   type="text"
+    // value={localVolume}
+    // onKeyDown={handleKeyDown}
+    // onChange={handleChange}
+    // onBlur={handleBlur}
+    //   className="w-6 text-sm text-center font-mono"
+    //   maxLength={2}
+    //   spellCheck={false}
+    // />
   );
 }
 
