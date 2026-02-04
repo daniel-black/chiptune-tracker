@@ -1,16 +1,18 @@
-export type Duty = 0.125 | 0.25 | 0.5 | 0.75;
+import type { Duty } from "./audio/duty";
+import type { MusicalNote } from "./audio/notes";
+import type { VolumeLevel } from "./audio/volume";
 
 export type PulseCell = {
   kind: "pulse";
-  note: string;
-  duty: Duty;
-  volume: number;
+  note: MusicalNote | "OFF" | "---";
+  duty: Duty | "--";
+  volume: VolumeLevel | "--";
 };
 
 export type NoiseCell = {
   kind: "noise";
-  rate: string;
-  volume: number;
+  rate: string | "--";
+  volume: VolumeLevel | "--";
 };
 
 export type Cell = PulseCell | NoiseCell;
@@ -18,3 +20,5 @@ export type Cell = PulseCell | NoiseCell;
 export type Row = [PulseCell, PulseCell, PulseCell, NoiseCell];
 
 export type Song = Array<Row>; // 32 rows
+
+export type CellPosition = { rowIndex: number; columnIndex: number };

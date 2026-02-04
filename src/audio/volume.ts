@@ -20,7 +20,7 @@ const volumeEntries = [
 
 export type VolumeLevel = (typeof volumeEntries)[number][0];
 
-function isVolumeLevel(num: number): num is VolumeLevel {
+export function isVolumeLevel(num: number): num is VolumeLevel {
   return num >= 0 && num <= 15 && Number.isInteger(num);
 }
 

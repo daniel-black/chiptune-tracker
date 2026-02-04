@@ -116,7 +116,7 @@ const noteEntries = [
 
 export type MusicalNote = (typeof noteEntries)[number][0];
 
-function isMusicalNote(note: string): note is MusicalNote {
+export function isMusicalNote(note: string): note is MusicalNote {
   return noteFrequencyMap.has(note as MusicalNote);
 }
 

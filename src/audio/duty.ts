@@ -1,10 +1,29 @@
-import type { Duty } from "../types";
+const dutyEntries = [
+  ["12", 0.125],
+  ["25", 0.25],
+  ["50", 0.5],
+  ["75", 0.75],
+] as const;
 
-export function getDuty(duty: string): Duty {
-  if (duty === "12") return 0.125;
-  if (duty === "25") return 0.25;
-  if (duty === "50") return 0.5;
-  if (duty === "75") return 0.75;
+export type Duty = (typeof dutyEntries)[number][0];
+export type DutyValue = (typeof dutyEntries)[number][1];
 
-  throw new Error(`Invalid duty (${duty}) passed to getDuty`);
+const dutyValueMap = new Map<Duty, DutyValue>(dutyEntries);
+
+function isDuty(duty: string): duty is Duty {
+  return dutyValueMap.has(duty as Duty);
+}
+
+export function getDutyValue(duty: string): DutyValue {
+  if (!isDuty(duty)) {
+    throw new Error(`Invalid duty (${duty}) passed to getDuty`);
+  }
+
+  const dutyValue = dutyValueMap.get(duty);
+
+  if (dutyValue === undefined) {
+    throw new Error(`Invalid duty (${duty}) passed to getDuty`);
+  }
+
+  return dutyValue;
 }
