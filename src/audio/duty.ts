@@ -10,7 +10,7 @@ export type DutyValue = (typeof dutyEntries)[number][1];
 
 const dutyValueMap = new Map<Duty, DutyValue>(dutyEntries);
 
-function isDuty(duty: string): duty is Duty {
+export function isDuty(duty: string): duty is Duty {
   return dutyValueMap.has(duty as Duty);
 }
 

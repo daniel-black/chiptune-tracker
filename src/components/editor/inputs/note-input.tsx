@@ -38,7 +38,7 @@ export function NoteInput({ note, setNote }: NoteInputProps) {
       type="text"
       value={localNote}
       onChange={handleLocalNoteChange}
-      className="w-6 text-sm text-center font-mono"
+      className="w-8 text-sm text-center font-mono"
       maxLength={3}
       spellCheck={false}
     />

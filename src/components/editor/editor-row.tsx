@@ -9,6 +9,9 @@ const columns = [0, 1, 2, 3] as const;
 export function EditorRow({ rowIndex }: EditorRowProps) {
   return (
     <tr>
+      <td className="border text-center font-mono text-xs px-2">
+        {rowIndex + 1}
+      </td>
       {columns.map((columnIndex) => (
         <EditorCell
           rowIndex={rowIndex}

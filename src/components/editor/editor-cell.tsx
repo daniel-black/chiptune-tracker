@@ -10,7 +10,7 @@ export function EditorCell({ rowIndex, columnIndex }: EditorCellProps) {
   const isNoiseColumn = columnIndex === 3;
 
   return (
-    <td className="border w-44">
+    <td className="border w-44 p-1">
       <div className="flex justify-around">
         {isNoiseColumn ? (
           <NoiseCell rowIndex={rowIndex} columnIndex={columnIndex} />

@@ -1,4 +1,5 @@
 import { usePulseCell } from "../../atoms/cell";
+import { DutyInput } from "./inputs/duty-input";
 import { NoteInput } from "./inputs/note-input";
 import { VolumeInput } from "./inputs/volume-input";
 
@@ -16,7 +17,7 @@ export function PulseCell({ rowIndex, columnIndex }: PulseCellProps) {
   return (
     <>
       <NoteInput note={pulseCell.note} setNote={setNote} />
-      <div>duty</div>
+      <DutyInput duty={pulseCell.duty} setDuty={setDuty} />
       <VolumeInput volume={pulseCell.volume} setVolume={setVolume} />
     </>
   );

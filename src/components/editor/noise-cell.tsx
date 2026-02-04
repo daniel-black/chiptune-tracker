@@ -1,4 +1,5 @@
 import { useNoiseCell } from "../../atoms/cell";
+import { RateInput } from "./inputs/rate-input";
 import { VolumeInput } from "./inputs/volume-input";
 
 type NoiseCellProps = {
@@ -11,7 +12,7 @@ export function NoiseCell({ rowIndex, columnIndex }: NoiseCellProps) {
 
   return (
     <>
-      <div>rate</div>
+      <RateInput rate={noiseCell.rate} setRate={setRate} />
       <VolumeInput volume={noiseCell.volume} setVolume={setVolume} />
     </>
   );
