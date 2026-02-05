@@ -25,7 +25,9 @@ export class AudioEngine {
   private readonly lookAheadTime = 0.1; // 100ms
   private nextTickTime = 0;
   private scheduleIntervalId: number | null = null;
+
   private sourcesStarted: boolean;
+  private subscriptionsStarted: boolean;
 
   // for store
   private readonly store: Store;
@@ -47,10 +49,14 @@ export class AudioEngine {
     ];
 
     this.sourcesStarted = false;
+    this.subscriptionsStarted = false;
   }
 
   // React changes atoms -> engine reacts.
   public startSubscriptions(): void {
+    if (this.subscriptionsStarted) return;
+    this.subscriptionsStarted = true;
+
     // subscribe to playback status
     this.unsubscribers.push(
       this.store.sub(playbackStatusAtom, () => {
@@ -72,10 +78,13 @@ export class AudioEngine {
 
     this.unsubscribers.push(
       this.store.sub(normalizedMasterVolumeAtom, () => {
-        const gain = this.store.get(normalizedMasterVolumeAtom);
-        if (gain >= 0 || gain <= 1) {
-          this.masterGainNode.gain.setValueAtTime(gain, this.ctx.currentTime);
-        }
+        const volume = this.store.get(normalizedMasterVolumeAtom);
+        const clampedGain = Math.max(0, Math.min(volume, 1));
+
+        this.masterGainNode.gain.setValueAtTime(
+          clampedGain,
+          this.ctx.currentTime,
+        );
       }),
     );
   }
@@ -93,11 +102,20 @@ export class AudioEngine {
     return 60 / (this.getBpm() * this.rowsPerBeat);
   }
 
-  private onPlay() {
-    console.log("[AUDIO ENGINE] PLAYING");
+  private async onPlay() {
+    if (this.scheduleIntervalId !== null) {
+      console.error(
+        `scheduleIntervalId already exists! ${this.scheduleIntervalId}`,
+      );
+      return;
+    }
 
     if (!this.sourcesStarted) {
       this.startAllSources();
+    }
+
+    if (this.ctx.state === "suspended") {
+      await this.ctx.resume();
     }
 
     this.nextTickTime = this.ctx.currentTime;
@@ -110,6 +128,13 @@ export class AudioEngine {
   }
 
   private scheduler(): void {
+    if (this.store.get(playbackStatusAtom) !== "playing") {
+      console.error(
+        `Calling scheduler while playback status is ${this.store.get(playbackStatusAtom)}`,
+      );
+      return;
+    }
+
     // Schedule notes until we're a bit ahead of current time
     while (this.nextTickTime < this.ctx.currentTime + this.lookAheadTime) {
       // Schedule the current row
@@ -125,22 +150,22 @@ export class AudioEngine {
 
   private scheduleRow(time: number): void {
     const row = this.store.get(synthesizedPlayheadRow);
-    console.log(time, row);
+    // console.log(time, row); // this keeps on getting logged even after pausing or stopping...
 
     for (let i = 0; i < row.length; i++) {
-      const features = row[i];
+      const audio = row[i];
       const channel = this.channels[i];
 
-      if (features.kind === "pulse" && channel instanceof PulseChannel) {
-        channel.setFrequencyAtTime(features.frequency, time);
-        channel.changeWaveShape(features.duty);
+      if (audio.kind === "pulse" && channel instanceof PulseChannel) {
+        channel.setFrequencyAtTime(audio.frequency, time);
+        channel.changeWaveShape(audio.duty);
       }
 
-      if (features.kind === "noise" && channel instanceof NoiseChannel) {
-        channel.setRateAtTime(features.rate, time);
+      if (audio.kind === "noise" && channel instanceof NoiseChannel) {
+        channel.setRateAtTime(audio.rate, time);
       }
 
-      channel.setVolumeAtTime(features.gain, time);
+      channel.setVolumeAtTime(audio.gain, time);
     }
   }
 
@@ -158,33 +183,29 @@ export class AudioEngine {
       }
 
       // stop
-      this.onStop();
+      this.store.set(playbackStatusAtom, "stopped");
+      this.stopScheduler();
       return;
     }
 
     this.store.set(playheadAtom, nextPlayhead);
   }
 
-  private onPause() {
-    console.log("[AUDIO ENGINE] PAUSED");
+  private async onPause() {
+    this.stopScheduler();
+
+    await this.ctx.suspend();
   }
 
   private onStop() {
-    console.log("[AUDIO ENGINE] STOPPED");
-
-    this.stopScheduling();
+    this.stopScheduler();
     this.silenceAllChannels();
   }
 
-  private stopScheduling(): void {
+  private stopScheduler(): void {
     if (this.scheduleIntervalId !== null) {
       clearInterval(this.scheduleIntervalId);
       this.scheduleIntervalId = null;
-    }
-
-    // If playback reaches the end of the song and loop is false, stop the playback
-    if (this.store.get(playbackStatusAtom) === "playing") {
-      this.store.set(playbackStatusAtom, "stopped");
     }
   }
 
@@ -201,9 +222,14 @@ export class AudioEngine {
     });
   }
 
-  dispose() {
+  public stopSubscriptions(): void {
     this.unsubscribers.forEach((unsubscribe) => unsubscribe());
     this.unsubscribers = [];
+    this.subscriptionsStarted = false;
+  }
+
+  dispose() {
+    this.stopSubscriptions();
     this.ctx.close();
   }
 }

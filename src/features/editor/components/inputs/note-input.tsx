@@ -39,14 +39,12 @@ export function NoteInput({ note, setNote }: NoteInputProps) {
     }
 
     if (e.key === "o") {
-      console.log("shortcutting OFF");
       setNote("OFF");
       setLocalNote("OFF");
       return;
     }
 
     if (localNote.length !== 1 && e.key === "-") {
-      console.log("shortcutting continue");
       setNote("---");
       setLocalNote("---");
       return;

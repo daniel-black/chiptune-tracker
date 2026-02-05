@@ -12,7 +12,7 @@ export function MasterVolume() {
         min={0}
         max={100}
         value={volume}
-        onChangeCapture={(e) => setVolume(e.target.valueAsNumber)}
+        onChange={(e) => setVolume(e.target.valueAsNumber)}
       />
       <span className="tabular-nums font-mono w-10 text-left">{volume}%</span>
     </div>
