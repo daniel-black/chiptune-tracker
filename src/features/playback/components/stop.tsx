@@ -10,7 +10,7 @@ export function Stop() {
   return (
     <Button
       variant="destructive"
-      size="icon-lg"
+      size="icon"
       disabled={!canStop}
       onClick={stopPlayback}
     >

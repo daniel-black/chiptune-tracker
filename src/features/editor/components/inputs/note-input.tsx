@@ -101,6 +101,7 @@ export function NoteInput({ note, setNote }: NoteInputProps) {
 
   return (
     <TextInput
+      editorInputType="note"
       value={localNote}
       onKeyDown={handleKeyDown}
       onChange={handleChange}

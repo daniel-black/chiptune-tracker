@@ -66,6 +66,7 @@ export function VolumeInput({ volume, setVolume }: VolumeInputProps) {
 
   return (
     <TextInput
+      editorInputType="volume"
       value={localVolume}
       onKeyDown={handleKeyDown}
       onChange={handleChange}

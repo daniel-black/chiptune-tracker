@@ -10,7 +10,7 @@ export function Pause() {
   return (
     <Button
       variant="secondary"
-      size="icon-lg"
+      size="icon"
       disabled={!canPause}
       onClick={pausePlayback}
     >

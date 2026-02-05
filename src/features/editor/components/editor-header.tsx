@@ -33,7 +33,7 @@ function ChannelHeader({ name, index }: ChannelHeaderProps) {
   return (
     <th className="sticky top-0 z-10 bg-background border-b border-x p-2">
       <div className="flex justify-center gap-3 items-center flex-nowrap">
-        <h2 className="font-semibold select-none">{name}</h2>
+        <h2 className="font-normal select-none font-mono">{name}</h2>
         <Toggle variant="outline" onClick={toggleEnable} size="sm">
           {isEnabled ? (
             <Volume2Icon className="size-4" />

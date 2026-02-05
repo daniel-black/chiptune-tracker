@@ -1,4 +1,4 @@
-import { atom } from "jotai";
+import { atom, useAtom } from "jotai";
 import type {
   NoiseCell,
   PulseCell,
@@ -53,4 +53,10 @@ function synthesizeNoiseCell(noise: NoiseCell): SynthesizedNoiseCell {
     rate: getRateValue(noise.rate),
     gain: getVolume(noise.volume.toString()),
   };
+}
+
+const songNameAtom = atom<string>("");
+
+export function useSongName() {
+  return useAtom(songNameAtom);
 }

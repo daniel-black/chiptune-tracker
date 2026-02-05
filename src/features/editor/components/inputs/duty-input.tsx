@@ -57,6 +57,7 @@ export function DutyInput({ duty, setDuty }: DutyInputProps) {
 
   return (
     <TextInput
+      editorInputType="duty"
       value={localDuty}
       onKeyDown={handleKeyDown}
       onChange={handleChange}

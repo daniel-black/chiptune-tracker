@@ -8,7 +8,7 @@ export function Start() {
   const startPlayback = useSetAtom(startPlaybackAtom);
 
   return (
-    <Button size="icon-lg" disabled={!canStart} onClick={startPlayback}>
+    <Button size="icon" disabled={!canStart} onClick={startPlayback}>
       <PlayIcon />
     </Button>
   );
