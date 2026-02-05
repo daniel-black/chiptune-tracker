@@ -10,7 +10,7 @@ export function EditorHeader() {
   return (
     <thead className="h-10">
       <tr>
-        <th className="sticky top-0 z-10 bg-background border h-full">
+        <th className="sticky top-0 z-10 bg-background border-b h-full">
           <ResetRangeButton />
         </th>
         <ChannelHeader name="Channel 1" index={0} />
@@ -31,7 +31,7 @@ function ChannelHeader({ name, index }: ChannelHeaderProps) {
   const { isEnabled, toggleEnable } = useChannelEnable(index);
 
   return (
-    <th className="sticky top-0 z-10 bg-background border p-2">
+    <th className="sticky top-0 z-10 bg-background border-b border-x p-2">
       <div className="flex justify-center gap-3 items-center flex-nowrap">
         <h2 className="font-semibold select-none">{name}</h2>
         <Toggle variant="outline" onClick={toggleEnable} size="sm">

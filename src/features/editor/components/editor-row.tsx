@@ -11,7 +11,7 @@ const columns = [0, 1, 2, 3] as const;
 export function EditorRow({ rowIndex }: EditorRowProps) {
   return (
     <RowWrapper rowIndex={rowIndex}>
-      <td className="border-x font-mono">
+      <td className="border-x border-b font-mono">
         <RowControl rowIndex={rowIndex} />
       </td>
       {columns.map((columnIndex) => (
