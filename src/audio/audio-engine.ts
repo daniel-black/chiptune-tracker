@@ -6,6 +6,7 @@ import { synthesizedPlayheadRow } from "../atoms/song";
 import { loopAtom } from "../features/playback/atoms/loop";
 import { bpmAtom } from "../features/playback/atoms/bpm";
 import { playheadAtom } from "../features/playback/atoms/playhead";
+import { normalizedMasterVolumeAtom } from "../features/playback/atoms/master-volume";
 
 export class AudioEngine {
   // Audio Context and master volume
@@ -65,6 +66,15 @@ export class AudioEngine {
           case "stopped":
             this.onStop();
             return;
+        }
+      }),
+    );
+
+    this.unsubscribers.push(
+      this.store.sub(normalizedMasterVolumeAtom, () => {
+        const gain = this.store.get(normalizedMasterVolumeAtom);
+        if (gain >= 0 || gain <= 1) {
+          this.masterGainNode.gain.setValueAtTime(gain, this.ctx.currentTime);
         }
       }),
     );

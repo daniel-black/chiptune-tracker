@@ -1,5 +1,6 @@
 import { Bpm } from "./bpm";
 import { Loop } from "./loop";
+import { MasterVolume } from "./master-volume";
 import { Pause } from "./pause";
 import { Start } from "./start";
 import { Stop } from "./stop";
@@ -17,6 +18,8 @@ export function Controls() {
         <Bpm />
         <Loop />
       </div>
+
+      <MasterVolume />
     </div>
   );
 }
