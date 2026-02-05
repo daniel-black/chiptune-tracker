@@ -5,7 +5,6 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -14,6 +13,7 @@ import {
   useCanRowBeEndOfRange,
   useCanRowBeStartOfRange,
 } from "@/features/playback/atoms/range";
+import { padNumber } from "@/utils/format";
 import { useSetAtom } from "jotai";
 
 export function RowControl({ rowIndex }: { rowIndex: number }) {
@@ -28,9 +28,9 @@ export function RowControl({ rowIndex }: { rowIndex: number }) {
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="border-none w-full focus-visible:ring-0 hover:cursor-context-menu"
+          className="border-none w-10 focus-visible:ring-0 hover:cursor-context-menu"
         >
-          {rowIndex + 1}
+          {padNumber(rowIndex + 1)}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
@@ -48,10 +48,6 @@ export function RowControl({ rowIndex }: { rowIndex: number }) {
           >
             Set as end
           </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive">Reset</DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

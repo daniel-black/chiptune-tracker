@@ -1,6 +1,7 @@
 import { rows } from "@/audio/constants";
-import { atom, useAtomValue } from "jotai";
+import { atom, useAtomValue, useSetAtom } from "jotai";
 import { atomFamily } from "jotai-family";
+import { playheadAtom } from "./playhead";
 
 type Range = { start: number; end: number };
 
@@ -8,12 +9,36 @@ const defaultRange: Range = { start: 0, end: 63 } as const;
 
 export const playbackRangeAtom = atom<Range>(defaultRange);
 
-export const resetPlaybackRangeAtom = atom(null, (get, set) => {
+export const isDefaultRangeSelectedAtom = atom((get) => {
   const { start, end } = get(playbackRangeAtom);
-  if (start !== defaultRange.start && end !== defaultRange.end) {
-    set(playbackRangeAtom, { ...defaultRange });
+
+  return start === 0 && end === rows - 1;
+});
+
+const isInPlaybackRangeAtomFamily = atomFamily((rowIndex: number) =>
+  atom((get) => {
+    const { start, end } = get(playbackRangeAtom);
+    return start <= rowIndex && rowIndex <= end;
+  }),
+);
+
+export function useIsRowInPlaybackRange(rowIndex: number) {
+  return useAtomValue(isInPlaybackRangeAtomFamily(rowIndex));
+}
+
+const resetPlaybackRangeAtom = atom(null, (get, set) => {
+  const range = get(playbackRangeAtom);
+  if (range.start !== 0 || range.end !== rows - 1) {
+    set(playbackRangeAtom, defaultRange);
   }
 });
+
+export function useResetPlaybackRange() {
+  const reset = useSetAtom(resetPlaybackRangeAtom);
+  const isDefaultRangeSelected = useAtomValue(isDefaultRangeSelectedAtom);
+
+  return { canReset: !isDefaultRangeSelected, reset } as const;
+}
 
 export const setStartOfPlaybackRangeAtom = atom(
   null,
@@ -27,6 +52,11 @@ export const setStartOfPlaybackRangeAtom = atom(
       start < range.end
     ) {
       set(playbackRangeAtom, { start, end: range.end });
+
+      // if playhead is before start, move it to start
+      if (get(playheadAtom) < start) {
+        set(playheadAtom, start);
+      }
     }
   },
 );
@@ -36,6 +66,10 @@ export const setEndOfPlaybackRangeAtom = atom(null, (get, set, end: number) => {
 
   if (end > 0 && end < rows && range.end !== end && range.start < end) {
     set(playbackRangeAtom, { start: range.start, end });
+
+    if (get(playheadAtom) > end) {
+      set(playheadAtom, end);
+    }
   }
 });
 

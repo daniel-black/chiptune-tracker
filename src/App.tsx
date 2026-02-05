@@ -8,6 +8,7 @@ import { initAudioOnce, stopSubscriptions } from "./bootstrap";
 import { useEffect } from "react";
 import { Controls } from "./features/playback/components/controls";
 import { rows } from "./audio/constants";
+import { TooltipProvider } from "./components/ui/tooltip";
 
 const rowArray = Array.from({ length: rows }, (_, i) => i);
 
@@ -22,19 +23,21 @@ export function App() {
 
   return (
     <JotaiProvider store={store}>
-      <div className="flex">
-        <Editor>
-          <EditorHeader />
-          <EditorBody>
-            {rowArray.map((rowIndex) => (
-              <EditorRow rowIndex={rowIndex} key={rowIndex} />
-            ))}
-          </EditorBody>
-        </Editor>
-        <div className="px-2">
-          <Controls />
+      <TooltipProvider>
+        <div className="flex">
+          <Editor>
+            <EditorHeader />
+            <EditorBody>
+              {rowArray.map((rowIndex) => (
+                <EditorRow rowIndex={rowIndex} key={rowIndex} />
+              ))}
+            </EditorBody>
+          </Editor>
+          <div className="px-2">
+            <Controls />
+          </div>
         </div>
-      </div>
+      </TooltipProvider>
     </JotaiProvider>
   );
 }

@@ -4,12 +4,15 @@ import {
   type ChannelIndex,
 } from "../../playback/atoms/enable";
 import { Toggle } from "@/components/ui/toggle";
+import { ResetRangeButton } from "./reset-range-button";
 
 export function EditorHeader() {
   return (
     <thead className="h-10">
       <tr>
-        <th className="sticky top-0 z-10 bg-background border"></th>
+        <th className="sticky top-0 z-10 bg-background border h-full">
+          <ResetRangeButton />
+        </th>
         <ChannelHeader name="Channel 1" index={0} />
         <ChannelHeader name="Channel 2" index={1} />
         <ChannelHeader name="Channel 3" index={2} />

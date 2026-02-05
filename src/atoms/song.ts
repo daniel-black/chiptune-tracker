@@ -54,27 +54,3 @@ function synthesizeNoiseCell(noise: NoiseCell): SynthesizedNoiseCell {
     gain: getVolume(noise.volume.toString()),
   };
 }
-
-// ^ could create a derived atom from songAtom that contains playable values for audio synth...
-// export const playableSongAtom = atom((get) => {
-//   const song = get(songAtom);
-
-//   const playable = song.map((row) => [
-//     ...row.map((col) => {
-//       if (col.kind === "pulse") {
-//         return {
-//           freq: getNoteFrequency(col.note),
-//           duty: getDutyValue(col.duty),
-//           vol: getVolume(col.volume),
-//         };
-//       }
-
-//       return {
-//         rate: getRateValue(col.rate),
-//         vol: getVolume(col.volume),
-//       };
-//     }),
-//   ]);
-
-//   return playable;
-// });

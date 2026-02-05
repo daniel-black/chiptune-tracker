@@ -1,4 +1,4 @@
-import type { CellPosition, NoiseCell, PulseCell, Song } from "../types";
+import type { CellPosition, NoiseCell, PulseCell, Row, Song } from "../types";
 import { rows } from "./constants";
 
 export function createDefaultPulseCell(): PulseCell {
@@ -18,13 +18,17 @@ export function createDefaultNoiseCell(): NoiseCell {
   };
 }
 
-export function createDefaultSong(): Song {
-  return Array.from({ length: rows }, () => [
+export function createDefaultRow(): Row {
+  return [
     createDefaultPulseCell(),
     createDefaultPulseCell(),
     createDefaultPulseCell(),
     createDefaultNoiseCell(),
-  ]);
+  ];
+}
+
+export function createDefaultSong(): Song {
+  return Array.from({ length: rows }, createDefaultRow);
 }
 
 export const cellKey = (rowIndex: number, columnIndex: number) =>

@@ -18,7 +18,7 @@ export function TextInput(props: TextInputProps) {
   return (
     <input
       {...props}
-      className={`${width} text-sm text-center font-mono outline-none rounded-xs selection:bg-red-300 focus:ring-2 focus:ring-orange-400`}
+      className={`${width} text-sm text-center font-mono outline-none selection:bg-transparent focus:ring-2 focus:ring-primary`}
       type="text"
       spellCheck={false}
     />
