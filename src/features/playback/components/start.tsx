@@ -1,17 +1,15 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { canStartPlaybackAtom, startPlaybackAtom } from "../atoms/playback";
+import { Button } from "@/components/ui/button";
+import { PlayIcon } from "lucide-react";
 
 export function Start() {
   const canStart = useAtomValue(canStartPlaybackAtom);
   const startPlayback = useSetAtom(startPlaybackAtom);
 
   return (
-    <button
-      className="px-2 border disabled:text-gray-500"
-      disabled={!canStart}
-      onClick={startPlayback}
-    >
-      START
-    </button>
+    <Button size="icon-lg" disabled={!canStart} onClick={startPlayback}>
+      <PlayIcon />
+    </Button>
   );
 }

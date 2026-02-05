@@ -1,4 +1,5 @@
 import type { CellPosition, NoiseCell, PulseCell, Song } from "../types";
+import { rows } from "./constants";
 
 export function createDefaultPulseCell(): PulseCell {
   return {
@@ -18,7 +19,7 @@ export function createDefaultNoiseCell(): NoiseCell {
 }
 
 export function createDefaultSong(): Song {
-  return Array.from({ length: 64 }, () => [
+  return Array.from({ length: rows }, () => [
     createDefaultPulseCell(),
     createDefaultPulseCell(),
     createDefaultPulseCell(),
@@ -34,7 +35,7 @@ export function parseCellKey(cellKey: string): CellPosition {
   const row = Number(r);
   const col = Number(c);
 
-  if (!Number.isInteger(row) || row < 0 || row >= 64) {
+  if (!Number.isInteger(row) || row < 0 || row >= rows) {
     throw new Error(`Invalid row in cell key: "${cellKey}"`);
   }
   if (![0, 1, 2, 3].includes(col)) {

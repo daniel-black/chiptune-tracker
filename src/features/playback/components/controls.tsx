@@ -1,3 +1,4 @@
+import { ButtonGroup } from "@/components/ui/button-group";
 import { Bpm } from "./bpm";
 import { Loop } from "./loop";
 import { MasterVolume } from "./master-volume";
@@ -8,17 +9,14 @@ import { Stop } from "./stop";
 export function Controls() {
   return (
     <div className="p-2 border space-y-2">
-      <div className="flex gap-1">
+      <ButtonGroup>
         <Start />
         <Stop />
         <Pause />
-      </div>
+      </ButtonGroup>
 
-      <div className="flex justify-between">
-        <Bpm />
-        <Loop />
-      </div>
-
+      <Loop />
+      <Bpm />
       <MasterVolume />
     </div>
   );

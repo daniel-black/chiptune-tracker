@@ -1,0 +1,59 @@
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  setEndOfPlaybackRangeAtom,
+  setStartOfPlaybackRangeAtom,
+  useCanRowBeEndOfRange,
+  useCanRowBeStartOfRange,
+} from "@/features/playback/atoms/range";
+import { useSetAtom } from "jotai";
+
+export function RowControl({ rowIndex }: { rowIndex: number }) {
+  const canBeStart = useCanRowBeStartOfRange(rowIndex);
+  const setStartOfPlaybackRange = useSetAtom(setStartOfPlaybackRangeAtom);
+
+  const canBeEnd = useCanRowBeEndOfRange(rowIndex);
+  const setEndOfPlaybackRange = useSetAtom(setEndOfPlaybackRangeAtom);
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          className="border-none w-full focus-visible:ring-0 hover:cursor-context-menu"
+        >
+          {rowIndex + 1}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Row {rowIndex + 1}</DropdownMenuLabel>
+          <DropdownMenuItem
+            onClick={() => setStartOfPlaybackRange(rowIndex)}
+            disabled={!canBeStart}
+          >
+            Set as start
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => setEndOfPlaybackRange(rowIndex)}
+            disabled={!canBeEnd}
+          >
+            Set as end
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem variant="destructive">Reset</DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}

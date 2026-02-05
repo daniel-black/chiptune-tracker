@@ -7,7 +7,8 @@ import { loopAtom } from "../features/playback/atoms/loop";
 import { bpmAtom } from "../features/playback/atoms/bpm";
 import { playheadAtom } from "../features/playback/atoms/playhead";
 import { normalizedMasterVolumeAtom } from "../features/playback/atoms/master-volume";
-import { channelMuteBaseAtom } from "../features/playback/atoms/mute";
+import { channelEnableBaseAtom } from "../features/playback/atoms/enable";
+import { playbackRangeAtom } from "@/features/playback/atoms/range";
 
 export class AudioEngine {
   // Audio Context and master volume
@@ -151,12 +152,12 @@ export class AudioEngine {
 
   private scheduleRow(time: number): void {
     const row = this.store.get(synthesizedPlayheadRow);
-    const muted = this.store.get(channelMuteBaseAtom);
+    const enabled = this.store.get(channelEnableBaseAtom);
     // console.log(time, row); // this keeps on getting logged even after pausing or stopping...
 
     for (let i = 0; i < row.length; i++) {
       const audio = row[i];
-      const isMuted = muted[i];
+      const isEnabled = enabled[i];
       const channel = this.channels[i];
 
       if (audio.kind === "pulse" && channel instanceof PulseChannel) {
@@ -170,34 +171,33 @@ export class AudioEngine {
 
       channel.setVolumeAtTime(audio.gain, time);
 
-      if (isMuted) {
-        channel.muteAtTime(time);
-      } else {
+      if (isEnabled) {
         channel.unmuteAtTime(time);
+      } else {
+        channel.muteAtTime(time);
       }
     }
   }
 
   private advancePlayhead(): void {
-    const prevPlayhead = this.store.get(playheadAtom);
-    let nextPlayhead = prevPlayhead + 1;
-
     const loop = this.store.get(loopAtom);
+    const range = this.store.get(playbackRangeAtom);
+    const playhead = this.store.get(playheadAtom);
 
-    if (nextPlayhead > 63) {
+    if (playhead + 1 > range.end) {
       if (loop) {
-        nextPlayhead = 0;
-        this.store.set(playheadAtom, nextPlayhead);
+        this.store.set(playheadAtom, range.start);
         return;
       }
 
       // stop
       this.store.set(playbackStatusAtom, "stopped");
+      this.store.set(playheadAtom, range.start);
       this.stopScheduler();
       return;
     }
 
-    this.store.set(playheadAtom, nextPlayhead);
+    this.store.set(playheadAtom, playhead + 1);
   }
 
   private async onPause() {

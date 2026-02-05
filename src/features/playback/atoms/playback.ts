@@ -1,5 +1,6 @@
 import { atom } from "jotai";
 import { playheadAtom } from "./playhead";
+import { playbackRangeAtom } from "./range";
 
 type PlaybackStatus = "stopped" | "playing" | "paused";
 
@@ -24,10 +25,11 @@ export const startPlaybackAtom = atom(null, (get, set) => {
   }
 });
 
-export const stopPlaybackAtom = atom(null, (_, set) => {
+export const stopPlaybackAtom = atom(null, (get, set) => {
   set(playbackStatusAtom, "stopped");
-  set(playheadAtom, 0);
+
   // set the playhead back to the start of the range
+  set(playheadAtom, get(playbackRangeAtom).start);
 });
 
 export const pausePlaybackAtom = atom(null, (get, set) => {
