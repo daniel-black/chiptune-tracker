@@ -1,6 +1,6 @@
 export function EditorHeader() {
   return (
-    <thead>
+    <thead className="h-10">
       <tr>
         <th className="sticky top-0 z-10 bg-gray-100 border"></th>
         <th className="sticky top-0 z-10 bg-gray-100 border text-left p-2">

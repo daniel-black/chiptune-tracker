@@ -1,8 +1,8 @@
 import { atom, useAtom } from "jotai";
 import { atomFamily } from "jotai-family";
-import { cellKey, parseCellKey } from "../audio/utils";
-import { songAtom } from "./song";
-import type { NoiseCell, PulseCell, Row } from "../types";
+import { cellKey, parseCellKey } from "../../../audio/utils";
+import { songAtom } from "../../../atoms/song";
+import type { NoiseCell, PulseCell, Row } from "../../../types";
 
 type SetStateAction<T> = T | ((prev: T) => T);
 

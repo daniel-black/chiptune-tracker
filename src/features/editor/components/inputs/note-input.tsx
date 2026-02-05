@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { PulseCell } from "../../../types";
-import { isMusicalNote, type MusicalNote } from "../../../audio/notes";
+import type { PulseCell } from "../../../../types";
+import { isMusicalNote, type MusicalNote } from "../../../../audio/notes";
 import { TextInput } from "./text-input";
 
 function isValidPitch(value: string): boolean {
@@ -109,15 +109,5 @@ export function NoteInput({ note, setNote }: NoteInputProps) {
       onBlur={handleBlur}
       maxLength={3}
     />
-    // <input
-    //   type="text"
-    //   value={localNote}
-    // onKeyDown={handleKeyDown}
-    // onChange={handleChange}
-    // onBlur={handleBlur}
-    //   className="w-8 text-sm text-center font-mono"
-    //   maxLength={3}
-    //   spellCheck={false}
-    // />
   );
 }

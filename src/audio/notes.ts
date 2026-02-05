@@ -123,6 +123,10 @@ export function isMusicalNote(note: string): note is MusicalNote {
 const noteFrequencyMap = new Map<MusicalNote, number>(noteEntries);
 
 export function getNoteFrequency(note: string): number {
+  if (note === "---") {
+    return -1;
+  }
+
   if (note === "OFF") {
     return 0;
   }

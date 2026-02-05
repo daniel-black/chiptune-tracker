@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { PulseCell } from "../../../types";
-import { isDuty } from "../../../audio/duty";
+import type { PulseCell } from "../../../../types";
+import { isDuty } from "../../../../audio/duty";
 import { TextInput } from "./text-input";
 
 function isValidFirstLetterForDuty(value: string) {
@@ -63,15 +63,5 @@ export function DutyInput({ duty, setDuty }: DutyInputProps) {
       onBlur={handleBlur}
       maxLength={2}
     />
-    // <input
-    //   type="text"
-    //   value={localDuty}
-    //   onKeyDown={handleKeyDown}
-    //   onChange={handleChange}
-    //   onBlur={handleBlur}
-    //   className="w-6 text-sm text-center font-mono"
-    //   maxLength={2}
-    //   spellCheck={false}
-    // />
   );
 }

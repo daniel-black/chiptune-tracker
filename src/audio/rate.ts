@@ -13,7 +13,11 @@ type Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
  */
 export type Rate = `${Digit}${Digit}`;
 
-export function getRateValue(rate: Rate): number {
+export function getRateValue(rate: string): number {
+  if (rate === "--") {
+    return -1;
+  }
+
   const parsedRate = parseInt(rate, 10);
 
   if (isNaN(parsedRate)) {

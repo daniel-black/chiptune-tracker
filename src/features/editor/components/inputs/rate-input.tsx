@@ -1,7 +1,8 @@
 import { useState } from "react";
-import type { NoiseCell } from "../../../types";
-import type { Rate } from "../../../audio/rate";
+import type { NoiseCell } from "../../../../types";
+import type { Rate } from "../../../../audio/rate";
 import { TextInput } from "./text-input";
+import { padNumber } from "../../../../utils/format";
 
 type RateInputProps = {
   rate: NoiseCell["rate"];
@@ -77,20 +78,5 @@ export function RateInput({ rate, setRate }: RateInputProps) {
       onBlur={handleBlur}
       maxLength={2}
     />
-    // <input
-    //   type="text"
-    //   value={localRate}
-    //   onKeyDown={handleKeyDown}
-    //   onChange={handleChange}
-    //   onBlur={handleBlur}
-    //   className="w-6 text-sm text-center font-mono"
-    //   maxLength={2}
-    //   spellCheck={false}
-    // />
   );
-}
-
-function padNumber(num: number): string {
-  if (num < 10) return `0${num}`;
-  return num.toString();
 }

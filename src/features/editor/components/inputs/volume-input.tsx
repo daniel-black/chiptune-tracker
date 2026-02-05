@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { isVolumeLevel } from "../../../audio/volume";
-import type { Cell } from "../../../types";
+import { isVolumeLevel } from "../../../../audio/volume";
+import type { Cell } from "../../../../types";
 import { TextInput } from "./text-input";
+import { padNumber } from "../../../../utils/format";
 
 type VolumeInputProps = {
   volume: Cell["volume"];
@@ -71,20 +72,5 @@ export function VolumeInput({ volume, setVolume }: VolumeInputProps) {
       onBlur={handleBlur}
       maxLength={2}
     />
-    // <input
-    //   type="text"
-    // value={localVolume}
-    // onKeyDown={handleKeyDown}
-    // onChange={handleChange}
-    // onBlur={handleBlur}
-    //   className="w-6 text-sm text-center font-mono"
-    //   maxLength={2}
-    //   spellCheck={false}
-    // />
   );
-}
-
-function padNumber(num: number): string {
-  if (num < 10) return `0${num}`;
-  return num.toString();
 }

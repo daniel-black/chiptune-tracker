@@ -6,7 +6,7 @@ const dutyEntries = [
 ] as const;
 
 export type Duty = (typeof dutyEntries)[number][0];
-export type DutyValue = (typeof dutyEntries)[number][1];
+export type DutyValue = (typeof dutyEntries)[number][1] | -1;
 
 const dutyValueMap = new Map<Duty, DutyValue>(dutyEntries);
 
@@ -15,6 +15,10 @@ export function isDuty(duty: string): duty is Duty {
 }
 
 export function getDutyValue(duty: string): DutyValue {
+  if (duty === "--") {
+    return -1;
+  }
+
   if (!isDuty(duty)) {
     throw new Error(`Invalid duty (${duty}) passed to getDuty`);
   }

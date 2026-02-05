@@ -27,6 +27,10 @@ export function isVolumeLevel(num: number): num is VolumeLevel {
 const volumeMap = new Map<VolumeLevel, number>(volumeEntries);
 
 export function getVolume(volumeString: string): number {
+  if (volumeString === "--") {
+    return -1;
+  }
+
   const parsedVolumeLevel = parseInt(volumeString, 10);
 
   if (isNaN(parsedVolumeLevel)) {
