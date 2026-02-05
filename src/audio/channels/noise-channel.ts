@@ -1,12 +1,9 @@
 export class NoiseChannel {
-  private readonly audioContext: AudioContext;
   private readonly source: AudioBufferSourceNode;
   private readonly gain: GainNode;
   private readonly gate: GainNode;
 
   constructor(audioContext: AudioContext, masterGain: GainNode) {
-    this.audioContext = audioContext;
-
     const buffer = this.createBuffer(audioContext);
 
     this.source = new AudioBufferSourceNode(audioContext, {
@@ -28,12 +25,12 @@ export class NoiseChannel {
     this.source.start();
   }
 
-  public mute(): void {
-    this.gate.gain.setValueAtTime(0, this.audioContext.currentTime);
+  public muteAtTime(time: number): void {
+    this.gate.gain.setValueAtTime(0, time);
   }
 
-  public unmute(): void {
-    this.gate.gain.setValueAtTime(1, this.audioContext.currentTime);
+  public unmuteAtTime(time: number): void {
+    this.gate.gain.setValueAtTime(1, time);
   }
 
   public setVolumeAtTime(volume: number, time: number): void {

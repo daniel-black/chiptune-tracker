@@ -4,7 +4,7 @@ import { EditorBody } from "./features/editor/components/editor-body";
 import { EditorHeader } from "./features/editor/components/editor-header";
 import { EditorRow } from "./features/editor/components/editor-row";
 import { store } from "./store";
-import { audioEngine, initAudioOnce } from "./bootstrap-audio";
+import { initAudioOnce, stopSubscriptions } from "./bootstrap";
 import { useEffect } from "react";
 import { Controls } from "./features/playback/components/controls";
 
@@ -15,7 +15,7 @@ export function App() {
     initAudioOnce();
 
     return () => {
-      audioEngine.stopSubscriptions();
+      stopSubscriptions();
     };
   }, []);
 

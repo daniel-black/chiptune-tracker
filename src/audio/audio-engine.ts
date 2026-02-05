@@ -7,6 +7,7 @@ import { loopAtom } from "../features/playback/atoms/loop";
 import { bpmAtom } from "../features/playback/atoms/bpm";
 import { playheadAtom } from "../features/playback/atoms/playhead";
 import { normalizedMasterVolumeAtom } from "../features/playback/atoms/master-volume";
+import { channelMuteBaseAtom } from "../features/playback/atoms/mute";
 
 export class AudioEngine {
   // Audio Context and master volume
@@ -150,10 +151,12 @@ export class AudioEngine {
 
   private scheduleRow(time: number): void {
     const row = this.store.get(synthesizedPlayheadRow);
+    const muted = this.store.get(channelMuteBaseAtom);
     // console.log(time, row); // this keeps on getting logged even after pausing or stopping...
 
     for (let i = 0; i < row.length; i++) {
       const audio = row[i];
+      const isMuted = muted[i];
       const channel = this.channels[i];
 
       if (audio.kind === "pulse" && channel instanceof PulseChannel) {
@@ -166,6 +169,12 @@ export class AudioEngine {
       }
 
       channel.setVolumeAtTime(audio.gain, time);
+
+      if (isMuted) {
+        channel.muteAtTime(time);
+      } else {
+        channel.unmuteAtTime(time);
+      }
     }
   }
 

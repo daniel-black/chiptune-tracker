@@ -2,14 +2,12 @@ import type { DutyValue } from "../duty";
 import { getWaveShaperCurve } from "../wave-shaper";
 
 export class PulseChannel {
-  private readonly audioContext: AudioContext;
   private readonly source: OscillatorNode;
   private readonly waveShaper: WaveShaperNode;
   private readonly gain: GainNode;
   private readonly gate: GainNode;
 
   constructor(audioContext: AudioContext, masterGain: GainNode) {
-    this.audioContext = audioContext;
     this.source = new OscillatorNode(audioContext, { type: "sawtooth" });
     this.waveShaper = new WaveShaperNode(audioContext, {
       curve: getWaveShaperCurve(0.5), // default to half-off, half-on pulse wave
@@ -30,12 +28,12 @@ export class PulseChannel {
     this.source.start();
   }
 
-  public mute(): void {
-    this.gate.gain.setValueAtTime(0, this.audioContext.currentTime);
+  public muteAtTime(time: number): void {
+    this.gate.gain.setValueAtTime(0, time);
   }
 
-  public unmute(): void {
-    this.gate.gain.setValueAtTime(1, this.audioContext.currentTime);
+  public unmuteAtTime(time: number): void {
+    this.gate.gain.setValueAtTime(1, time);
   }
 
   public setVolumeAtTime(volume: number, time: number): void {
