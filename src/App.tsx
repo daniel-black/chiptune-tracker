@@ -6,11 +6,7 @@ import { EditorRow } from "./features/editor/components/editor-row";
 import { store } from "./store";
 import { initAudioOnce } from "./bootstrap-audio";
 import { useEffect } from "react";
-import { Start } from "./features/playback/components/start";
-import { Stop } from "./features/playback/components/stop";
-import { Pause } from "./features/playback/components/pause";
-import { Bpm } from "./features/playback/components/bpm";
-import { Loop } from "./features/playback/components/loop";
+import { Controls } from "./features/playback/components/controls";
 
 const rows = Array.from({ length: 64 }, (_, i) => i);
 
@@ -30,12 +26,8 @@ export function App() {
             ))}
           </EditorBody>
         </Editor>
-        <div>
-          <Start />
-          <Stop />
-          <Pause />
-          <Bpm />
-          <Loop />
+        <div className="px-2">
+          <Controls />
         </div>
       </div>
     </Provider>

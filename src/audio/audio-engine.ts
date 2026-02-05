@@ -1,13 +1,11 @@
 import type { Store } from "jotai/vanilla/store";
 import { NoiseChannel } from "./channels/noise-channel";
 import { PulseChannel } from "./channels/pulse-channel";
-import {
-  bpmAtom,
-  loopAtom,
-  playbackStatusAtom,
-  playheadAtom,
-} from "../features/playback/atoms/playback";
+import { playbackStatusAtom } from "../features/playback/atoms/playback";
 import { synthesizedPlayheadRow } from "../atoms/song";
+import { loopAtom } from "../features/playback/atoms/loop";
+import { bpmAtom } from "../features/playback/atoms/bpm";
+import { playheadAtom } from "../features/playback/atoms/playhead";
 
 export class AudioEngine {
   // Audio Context and master volume

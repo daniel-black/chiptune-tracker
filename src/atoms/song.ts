@@ -8,12 +8,12 @@ import type {
   SynthesizedRow,
 } from "../types";
 import { createDefaultSong } from "../audio/utils";
-import { playheadAtom } from "../features/playback/atoms/playback";
 
 import { getNoteFrequency } from "../audio/notes";
 import { getDutyValue } from "../audio/duty";
 import { getVolume } from "../audio/volume";
 import { getRateValue } from "../audio/rate";
+import { playheadAtom } from "../features/playback/atoms/playhead";
 
 // Canonical, row-major song atom
 export const songAtom = atom<Song>(createDefaultSong());

@@ -1,6 +1,6 @@
 import { useNoiseCell } from "../atoms/cell";
-import { RateInput } from "../../components/editor/inputs/rate-input";
-import { VolumeInput } from "../../components/editor/inputs/volume-input";
+import { RateInput } from "./inputs/rate-input";
+import { VolumeInput } from "./inputs/volume-input";
 
 type NoiseCellProps = {
   rowIndex: number;

@@ -1,12 +1,17 @@
-import { useAtom } from "jotai";
-import { loopAtom } from "../../atoms/playback";
+import { useLoop } from "../atoms/loop";
 
 export function Loop() {
-  const [loop, setLoop] = useAtom(loopAtom);
+  const [loop, setLoop] = useLoop();
 
   return (
-    <button onClick={() => setLoop(!loop)}>
-      {loop ? "looping" : "not looping"}
-    </button>
+    <div className="flex items-center gap-1 no-wrap">
+      <input
+        type="checkbox"
+        checked={loop}
+        onChange={() => setLoop(!loop)}
+        id="loop"
+      />{" "}
+      <label htmlFor="loop">LOOP</label>
+    </div>
   );
 }

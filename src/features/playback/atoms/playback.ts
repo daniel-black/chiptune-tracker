@@ -1,9 +1,5 @@
 import { atom } from "jotai";
 
-export const loopAtom = atom(false); // atom that holds state of whether or not playback should loop
-
-export const bpmAtom = atom(120); // beats per min for the playback
-
 type PlaybackStatus = "stopped" | "playing" | "paused";
 
 export const playbackStatusAtom = atom<PlaybackStatus>("stopped");
@@ -38,5 +34,3 @@ export const pausePlaybackAtom = atom(null, (get, set) => {
     // retain the position of the playhead
   }
 });
-
-export const playheadAtom = atom<number>(0); // by default, play from first row

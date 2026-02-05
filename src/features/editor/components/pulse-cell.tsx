@@ -1,7 +1,7 @@
 import { usePulseCell } from "../atoms/cell";
-import { DutyInput } from "../../components/editor/inputs/duty-input";
-import { NoteInput } from "../../components/editor/inputs/note-input";
-import { VolumeInput } from "../../components/editor/inputs/volume-input";
+import { DutyInput } from "./inputs/duty-input";
+import { NoteInput } from "./inputs/note-input";
+import { VolumeInput } from "./inputs/volume-input";
 
 type PulseCellProps = {
   rowIndex: number;
