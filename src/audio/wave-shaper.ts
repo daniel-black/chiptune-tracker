@@ -23,7 +23,7 @@ export function createWaveShaperCurve(
 /**
  * Pre-computed wave shaper curves for standard duty cycles
  */
-const waveShaperCurves: Record<DutyValue, Float32Array<ArrayBuffer>> = {
+const waveShaperCurves: Record<number, Float32Array<ArrayBuffer>> = {
   0.125: createWaveShaperCurve(0.125),
   0.25: createWaveShaperCurve(0.25),
   0.5: createWaveShaperCurve(0.5),
@@ -37,5 +37,8 @@ const waveShaperCurves: Record<DutyValue, Float32Array<ArrayBuffer>> = {
  * @returns A Float32Array containing the wave shaper curve
  */
 export function getWaveShaperCurve(dutyCycle: DutyValue) {
+  if (dutyCycle < 0) {
+    throw new Error("Disallow invalid duty cycle");
+  }
   return waveShaperCurves[dutyCycle];
 }
