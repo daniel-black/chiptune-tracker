@@ -43,3 +43,11 @@ export type SynthesizedRow = [
 export type Song = Array<Row>; // 64 rows
 
 export type CellPosition = { rowIndex: number; columnIndex: number };
+
+export type PersistedSong = {
+  name: string;
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  pattern: Array<Row>;
+};

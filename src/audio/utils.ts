@@ -1,4 +1,12 @@
-import type { CellPosition, NoiseCell, PulseCell, Row, Song } from "../types";
+import { nowIso } from "@/utils/format";
+import type {
+  CellPosition,
+  NoiseCell,
+  PersistedSong,
+  PulseCell,
+  Row,
+  Song,
+} from "../types";
 import { rows } from "./constants";
 
 export function createDefaultPulseCell(): PulseCell {
@@ -46,4 +54,16 @@ export function parseCellKey(cellKey: string): CellPosition {
     throw new Error(`Invalid col in cell key: "${cellKey}"`);
   }
   return { rowIndex: row, columnIndex: col };
+}
+
+export function createNewPersistedSong(): PersistedSong {
+  const now = nowIso();
+
+  return {
+    name: "",
+    id: crypto.randomUUID(),
+    createdAt: now,
+    updatedAt: now,
+    pattern: createDefaultSong(), // rename this eventually
+  };
 }

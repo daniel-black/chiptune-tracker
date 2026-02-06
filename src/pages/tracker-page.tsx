@@ -9,7 +9,7 @@ import { Panel } from "@/features/panel/components/panel";
 import { PanelControls } from "@/features/panel/components/panel-controls";
 import { SongNameForm } from "@/features/panel/components/song-name-form";
 import { useEffect } from "react";
-import { useParams } from "react-router";
+import { Navigate, useParams } from "react-router";
 
 const rowArray = Array.from({ length: rows }, (_, i) => i);
 
@@ -24,6 +24,8 @@ export function TrackerPage() {
       stopSubscriptions();
     };
   }, []);
+
+  if (!songId) return <Navigate to="/" replace />;
 
   return (
     <div className="flex">

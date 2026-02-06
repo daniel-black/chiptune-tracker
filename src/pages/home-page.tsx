@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { CreateNewSongButton } from "@/components/create-new-song-button";
 import { Separator } from "@/components/ui/separator";
 
 export function HomePage() {
@@ -13,15 +13,7 @@ export function HomePage() {
             <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight font-mono">
               Songs
             </h3>
-            <Button
-              className="p-5 text-xl font-mono tracking-tight font-semibold"
-              onClick={() => {
-                const songId = crypto.randomUUID();
-                console.log(songId);
-              }}
-            >
-              CREATE NEW
-            </Button>
+            <CreateNewSongButton />
           </div>
           <Separator />
         </div>
