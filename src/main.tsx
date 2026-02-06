@@ -1,10 +1,20 @@
+import "./index.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { App } from "./App.tsx";
-import "./index.css";
+import { BrowserRouter, Route, Routes } from "react-router";
+import { HomePage } from "./pages/home-page.tsx";
+import { AppWrapper } from "./components/app-wrapper.tsx";
+import { TrackerPage } from "./pages/tracker-page.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <BrowserRouter>
+      <Routes>
+        <Route element={<AppWrapper />}>
+          <Route index element={<HomePage />} />
+          <Route path="/editor/:id" element={<TrackerPage />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   </StrictMode>,
 );

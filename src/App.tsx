@@ -1,9 +1,7 @@
-import { Provider as JotaiProvider } from "jotai";
 import { Editor } from "./features/editor/components/editor";
 import { EditorBody } from "./features/editor/components/editor-body";
 import { EditorHeader } from "./features/editor/components/editor-header";
 import { EditorRow } from "./features/editor/components/editor-row";
-import { store } from "./store";
 import { initAudioOnce, stopSubscriptions } from "./bootstrap";
 import { useEffect } from "react";
 import { rows } from "./audio/constants";
@@ -25,24 +23,22 @@ export function App() {
   }, []);
 
   return (
-    <JotaiProvider store={store}>
-      <TooltipProvider>
-        <div className="flex">
-          <Editor>
-            <EditorHeader />
-            <EditorBody>
-              {rowArray.map((i) => (
-                <EditorRow rowIndex={i} key={i} />
-              ))}
-            </EditorBody>
-          </Editor>
-          <Panel>
-            <PanelControls />
-            <SongNameForm />
-            <InputExplanation />
-          </Panel>
-        </div>
-      </TooltipProvider>
-    </JotaiProvider>
+    <TooltipProvider>
+      <div className="flex">
+        <Editor>
+          <EditorHeader />
+          <EditorBody>
+            {rowArray.map((i) => (
+              <EditorRow rowIndex={i} key={i} />
+            ))}
+          </EditorBody>
+        </Editor>
+        <Panel>
+          <PanelControls />
+          <SongNameForm />
+          <InputExplanation />
+        </Panel>
+      </div>
+    </TooltipProvider>
   );
 }
