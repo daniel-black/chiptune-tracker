@@ -1,4 +1,7 @@
 // Acceptable volume levels are 0 (silent) to 15 (full volume)
+// Since there are only a handful of discrete volume increments, I precomputed them
+// and made them available in a fast lookup like this. Probably doesn't matter at this
+// scale whether or not I did the math on the fly
 const volumeEntries = [
   [0, 0],
   [1, 0.066],

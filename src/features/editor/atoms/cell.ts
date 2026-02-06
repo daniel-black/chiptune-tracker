@@ -1,8 +1,10 @@
 import { atom, useAtom } from "jotai";
 import { atomFamily } from "jotai-family";
 import { patternAtom } from "@/atoms/pattern";
-import type { NoiseCell, PulseCell, Row } from "@/types";
 import { cellKey, parseCellKey } from "../utils";
+import type { PulseCell } from "@/models/pulse-cell";
+import type { Row } from "@/models/song";
+import type { NoiseCell } from "@/models/noise-cell";
 
 type SetStateAction<T> = T | ((prev: T) => T);
 

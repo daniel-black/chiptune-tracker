@@ -1,24 +1,21 @@
-import { resetPlaybackRangeAtom } from "@/features/playback/atoms/range";
-import { playheadAtom } from "@/features/playback/atoms/playhead";
-import type { PersistedSong } from "@/types";
-import { nowIso } from "@/utils/format";
-import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { atomFamily } from "jotai-family";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { atomWithStorage, createJSONStorage } from "jotai/utils";
+import { type Song } from "@/models/song";
+import { createNewSong } from "@/models/factory";
+import { nowIso } from "@/utils/format";
+import { resetPlaybackRangeAtom } from "@/features/playback/atoms/range";
 import { stopPlaybackAtom } from "@/features/playback/atoms/playback";
-import { createNewPersistedSong } from "@/models/song";
+import { playheadAtom } from "@/features/playback/atoms/playhead";
 
-const songStorage = createJSONStorage<PersistedSong>(() => localStorage);
+const songStorage = createJSONStorage<Song>(() => localStorage);
 const indexStorage = createJSONStorage<string[]>(() => localStorage);
 
 /** Memoized atom family — same uuid always returns the same atom instance. */
 export const songAtomFamily = atomFamily((uuid: string) =>
-  atomWithStorage<PersistedSong>(
-    `song:${uuid}`,
-    createNewPersistedSong(uuid),
-    songStorage,
-    { getOnInit: true },
-  ),
+  atomWithStorage<Song>(`song:${uuid}`, createNewSong(uuid), songStorage, {
+    getOnInit: true,
+  }),
 );
 
 /** Index in localStorage for keeping track of existing songs */
@@ -53,7 +50,7 @@ export function useCurrentSongId() {
 
 /** Atom for creating a new, persisted song and adding it to the index */
 const createNewSongAtom = atom(null, (get, set, uuid: string) => {
-  set(songAtomFamily(uuid), createNewPersistedSong(uuid));
+  set(songAtomFamily(uuid), createNewSong(uuid));
   const index = get(songIndexAtom);
   if (!index.includes(uuid)) {
     set(songIndexAtom, [...index, uuid]);

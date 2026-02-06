@@ -1,4 +1,4 @@
-import type { DutyValue } from "../duty";
+import type { DutyValue } from "../characteristics/duty";
 import { getWaveShaperCurve } from "../wave-shaper";
 
 export class PulseChannel {

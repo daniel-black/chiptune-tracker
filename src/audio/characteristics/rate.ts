@@ -5,7 +5,6 @@
 // The value at the level of representation is a string like "00" or "54"
 // The value at the level of audio synth needs to be decimal number like 0.0 or 5.4
 // "12" -> 1.2 just means play the noise channel at 1.2x the normal rate
-
 type Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 
 /**

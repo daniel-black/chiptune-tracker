@@ -13,7 +13,7 @@ import {
   useCanRowBeEndOfRange,
   useCanRowBeStartOfRange,
 } from "@/features/playback/atoms/range";
-import { padNumber } from "@/utils/format";
+import { padNumberTwoDigit } from "@/utils/format";
 import { useSetAtom } from "jotai";
 
 export function RowControl({ rowIndex }: { rowIndex: number }) {
@@ -30,7 +30,7 @@ export function RowControl({ rowIndex }: { rowIndex: number }) {
           variant="outline"
           className="border-none w-10 focus-visible:ring-0 hover:cursor-context-menu"
         >
-          {padNumber(rowIndex + 1)}
+          {padNumberTwoDigit(rowIndex + 1)}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>

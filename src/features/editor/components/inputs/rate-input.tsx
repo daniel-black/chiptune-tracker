@@ -1,8 +1,8 @@
 import { useState } from "react";
-import type { NoiseCell } from "../../../../types";
-import type { Rate } from "../../../../audio/rate";
+import type { Rate } from "@/audio/characteristics/rate";
 import { TextInput } from "./text-input";
-import { padNumber } from "../../../../utils/format";
+import { padNumberTwoDigit } from "@/utils/format";
+import type { NoiseCell } from "@/models/noise-cell";
 
 type RateInputProps = {
   rate: NoiseCell["rate"];
@@ -39,7 +39,7 @@ export function RateInput({ rate, setRate }: RateInputProps) {
       return;
     }
 
-    const paddedRate = padNumber(rateNum);
+    const paddedRate = padNumberTwoDigit(rateNum);
     setRate(paddedRate as Rate);
     setLocalRate(value);
   }
@@ -65,7 +65,7 @@ export function RateInput({ rate, setRate }: RateInputProps) {
     }
 
     // rate is in range
-    const paddedRate = padNumber(rateNum);
+    const paddedRate = padNumberTwoDigit(rateNum);
     setRate(paddedRate as Rate);
     setLocalRate(paddedRate);
   }

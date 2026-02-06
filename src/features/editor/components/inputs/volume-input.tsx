@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { isVolumeLevel } from "../../../../audio/volume";
-import type { Cell } from "../../../../types";
+import { isVolumeLevel } from "@/audio/characteristics/volume";
+import type { Cell } from "@/models/song";
 import { TextInput } from "./text-input";
-import { padNumber } from "../../../../utils/format";
+import { padNumberTwoDigit } from "@/utils/format";
 
 type VolumeInputProps = {
   volume: Cell["volume"];
@@ -12,7 +12,7 @@ type VolumeInputProps = {
 export function VolumeInput({ volume, setVolume }: VolumeInputProps) {
   // Local state for holding value during editing
   const [localVolume, setLocalVolume] = useState<string>(
-    volume !== "--" ? padNumber(volume) : volume,
+    volume !== "--" ? padNumberTwoDigit(volume) : volume,
   );
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -56,7 +56,7 @@ export function VolumeInput({ volume, setVolume }: VolumeInputProps) {
       if (volume !== parsedLocalVolume) {
         setVolume(parsedLocalVolume);
       }
-      setLocalVolume(padNumber(parsedLocalVolume));
+      setLocalVolume(padNumberTwoDigit(parsedLocalVolume));
       return;
     }
 

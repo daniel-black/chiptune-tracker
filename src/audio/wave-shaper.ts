@@ -1,4 +1,4 @@
-import type { DutyValue } from "./duty";
+import type { DutyValue } from "./characteristics/duty";
 
 const curveLength = 2048 as const;
 
@@ -17,8 +17,6 @@ export function createWaveShaperCurve(
 
   return curve;
 }
-
-// revisit this to see if Duty or DutyValue is the type that makes the most sense here
 
 /**
  * Pre-computed wave shaper curves for standard duty cycles

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { TextInput } from "./text-input";
-import { isMusicalNote, type MusicalNote } from "@/audio/notes";
-import type { PulseCell } from "@/types";
+import { isMusicalNote, type MusicalNote } from "@/audio/characteristics/notes";
+import type { PulseCell } from "@/models/pulse-cell";
 
 function isValidPitch(value: string): boolean {
   return /^[a-g]$/i.test(value);

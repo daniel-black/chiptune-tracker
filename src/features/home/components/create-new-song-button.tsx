@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { Button } from "../../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { useCreateNewSong } from "@/atoms/song";
 import { PlusIcon } from "lucide-react";
 

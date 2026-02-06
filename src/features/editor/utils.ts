@@ -1,5 +1,6 @@
 import { rows } from "@/audio/constants";
-import type { CellPosition } from "@/types";
+
+type CellPosition = { rowIndex: number; columnIndex: number };
 
 export const cellKey = (rowIndex: number, columnIndex: number) =>
   `${rowIndex}:${columnIndex}` as const;

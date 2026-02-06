@@ -16,9 +16,11 @@ export function PanelControls() {
       </ButtonGroup>
 
       <Loop />
+
       <div className="flex-1">
         <MasterVolume />
       </div>
+
       <Bpm />
     </div>
   );

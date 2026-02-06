@@ -1,15 +1,31 @@
-import type {
-  NoiseCell,
-  PulseCell,
-  SynthesizedNoiseCell,
-  SynthesizedPulseCell,
-} from "@/types";
-import { getNoteFrequency } from "./notes";
-import { getDutyValue } from "./duty";
-import { getVolume } from "./volume";
-import { getRateValue } from "./rate";
+import { getNoteFrequency } from "./characteristics/notes";
+import { getDutyValue, type DutyValue } from "./characteristics/duty";
+import { getVolume } from "./characteristics/volume";
+import { getRateValue } from "./characteristics/rate";
+import type { PulseCell } from "@/models/pulse-cell";
+import type { NoiseCell } from "@/models/noise-cell";
 
-/**Converts representation layer data into audio ready values */
+export type SynthesizedPulseCell = {
+  kind: "pulse";
+  frequency: number;
+  duty: DutyValue;
+  gain: number;
+};
+
+export type SynthesizedNoiseCell = {
+  kind: "noise";
+  rate: number;
+  gain: number;
+};
+
+export type SynthesizedRow = [
+  SynthesizedPulseCell,
+  SynthesizedPulseCell,
+  SynthesizedPulseCell,
+  SynthesizedNoiseCell,
+];
+
+/** Converts representation layer data into audio ready values */
 export function synthesizePulseCell(pulse: PulseCell): SynthesizedPulseCell {
   return {
     kind: "pulse",

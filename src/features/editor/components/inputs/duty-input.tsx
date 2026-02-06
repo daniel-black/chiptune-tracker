@@ -1,7 +1,7 @@
 import { useState } from "react";
-import type { PulseCell } from "../../../../types";
-import { isDuty } from "../../../../audio/duty";
+import { isDuty } from "@/audio/characteristics/duty";
 import { TextInput } from "./text-input";
+import type { PulseCell } from "@/models/pulse-cell";
 
 function isValidFirstLetterForDuty(value: string) {
   return /^[1257-]$/.test(value);

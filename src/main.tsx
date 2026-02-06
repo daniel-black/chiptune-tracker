@@ -1,10 +1,10 @@
 import "./index.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { HomePage } from "@/pages/home-page.tsx";
+import { EditorPage } from "@/pages/editor-page.tsx";
+import { AppWrapper } from "@/components/app-wrapper.tsx";
 import { BrowserRouter, Route, Routes } from "react-router";
-import { HomePage } from "./pages/home-page.tsx";
-import { AppWrapper } from "./components/app-wrapper.tsx";
-import { EditorPage } from "./pages/editor-page.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

@@ -1,5 +1,5 @@
 import { atom, useAtom } from "jotai";
-import { defaultBpm } from "../../../audio/constants";
+import { defaultBpm } from "@/audio/constants";
 
 export const bpmAtom = atom<number>(defaultBpm);
 

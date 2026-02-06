@@ -1,17 +1,16 @@
 import type { Store } from "jotai/vanilla/store";
 import { NoiseChannel } from "./channels/noise-channel";
 import { PulseChannel } from "./channels/pulse-channel";
-import { playbackStatusAtom } from "@/features/playback/atoms/playback";
 import { synthesizedPlayheadRowAtom } from "@/atoms/pattern";
 import { loopAtom } from "@/features/playback/atoms/loop";
 import { bpmAtom } from "@/features/playback/atoms/bpm";
 import { playheadAtom } from "@/features/playback/atoms/playhead";
-import { normalizedMasterVolumeAtom } from "@/features/playback/atoms/master-volume";
-import { channelEnableBaseAtom } from "@/features/playback/atoms/enable";
 import { playbackRangeAtom } from "@/features/playback/atoms/range";
+import { channelEnableBaseAtom } from "@/features/playback/atoms/enable";
+import { playbackStatusAtom } from "@/features/playback/atoms/playback";
+import { normalizedMasterVolumeAtom } from "@/features/playback/atoms/master-volume";
 
 export class AudioEngine {
-  // Audio Context and master volume
   private readonly ctx: AudioContext;
   private readonly masterGainNode: GainNode;
 

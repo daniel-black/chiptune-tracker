@@ -1,4 +1,4 @@
-export function padNumber(num: number): string {
+export function padNumberTwoDigit(num: number): string {
   if (num < 10) return `0${num}`;
   return num.toString();
 }

@@ -1,5 +1,5 @@
-import { store } from "./store";
-import { AudioEngine } from "./audio/audio-engine";
+import { store } from "@/store";
+import { AudioEngine } from "@/audio/audio-engine";
 
 // lazily instantiate so that AudioEngine is not created until first needed
 let audioEngine: AudioEngine | null = null;

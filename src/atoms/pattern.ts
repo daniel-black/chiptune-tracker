@@ -1,10 +1,14 @@
 import { atom } from "jotai";
-import type { Pattern, SynthesizedRow } from "../types";
 import { playheadAtom } from "@/features/playback/atoms/playhead";
 import { currentSongIdAtom, songAtomFamily } from "./song";
 import { nowIso } from "@/utils/format";
-import { createDefaultPattern } from "@/models/song";
-import { synthesizeNoiseCell, synthesizePulseCell } from "@/audio/synthesis";
+import { type Pattern } from "@/models/song";
+import {
+  synthesizeNoiseCell,
+  synthesizePulseCell,
+  type SynthesizedRow,
+} from "@/audio/synthesis";
+import { createDefaultPattern } from "@/models/factory";
 
 /**
  * Read/write derived atom that delegates to the persisted
