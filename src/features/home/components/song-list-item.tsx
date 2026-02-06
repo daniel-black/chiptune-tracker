@@ -1,4 +1,4 @@
-import { songAtomFamily, useDeleteSong } from "@/atoms/library";
+import { songAtomFamily, useDeleteSong } from "@/atoms/song";
 import { Button } from "@/components/ui/button";
 import { useAtomValue } from "jotai";
 import { Link } from "react-router";

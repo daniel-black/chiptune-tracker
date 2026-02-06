@@ -1,4 +1,4 @@
-import { songIndexAtom } from "@/atoms/library";
+import { songIndexAtom } from "@/atoms/song";
 import { CreateNewSongButton } from "@/features/home/components/create-new-song-button";
 import { Separator } from "@/components/ui/separator";
 import { useAtomValue } from "jotai";

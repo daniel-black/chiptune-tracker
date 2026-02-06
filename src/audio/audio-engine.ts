@@ -2,7 +2,7 @@ import type { Store } from "jotai/vanilla/store";
 import { NoiseChannel } from "./channels/noise-channel";
 import { PulseChannel } from "./channels/pulse-channel";
 import { playbackStatusAtom } from "../features/playback/atoms/playback";
-import { synthesizedPlayheadRow } from "../atoms/song";
+import { synthesizedPlayheadRowAtom } from "../atoms/pattern";
 import { loopAtom } from "../features/playback/atoms/loop";
 import { bpmAtom } from "../features/playback/atoms/bpm";
 import { playheadAtom } from "../features/playback/atoms/playhead";
@@ -151,9 +151,8 @@ export class AudioEngine {
   }
 
   private scheduleRow(time: number): void {
-    const row = this.store.get(synthesizedPlayheadRow);
+    const row = this.store.get(synthesizedPlayheadRowAtom);
     const enabled = this.store.get(channelEnableBaseAtom);
-    // console.log(time, row); // this keeps on getting logged even after pausing or stopping...
 
     for (let i = 0; i < row.length; i++) {
       const audio = row[i];

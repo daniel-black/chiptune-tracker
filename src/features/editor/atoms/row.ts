@@ -1,4 +1,4 @@
-import { rows } from "@/audio/constants";
+import { defaultRange } from "@/audio/constants";
 import { canStopPlaybackAtom } from "@/features/playback/atoms/playback";
 import { playheadAtom } from "@/features/playback/atoms/playhead";
 import { playbackRangeAtom } from "@/features/playback/atoms/range";
@@ -22,7 +22,7 @@ const rowStyleAtomFamily = atomFamily((rowIndex: number) =>
     }
 
     // no range highlight when the whole pattern is selected
-    if (range.start === 0 && range.end === rows - 1) {
+    if (range.start === defaultRange.start && range.end === defaultRange.end) {
       return "bg-transparent hover:bg-background/50";
     }
 

@@ -1,5 +1,5 @@
 import { rows } from "@/audio/constants";
-import { currentSongIdAtom } from "@/atoms/song";
+import { useCurrentSongId, useSetCurrentSongIdAtom } from "@/atoms/song";
 import { initAudioOnce, stopSubscriptions } from "@/bootstrap";
 import { Editor } from "@/features/editor/components/editor";
 import { EditorBody } from "@/features/editor/components/editor-body";
@@ -9,22 +9,24 @@ import { InputExplanation } from "@/features/panel/components/input-explanation"
 import { Panel } from "@/features/panel/components/panel";
 import { PanelControls } from "@/features/panel/components/panel-controls";
 import { SongNameForm } from "@/features/panel/components/song-name-form";
-import { useAtom } from "jotai";
 import { useEffect } from "react";
 import { Navigate, useParams } from "react-router";
 
 const rowArray = Array.from({ length: rows }, (_, i) => i);
 
-export function TrackerPage() {
+export function EditorPage() {
   const params = useParams<{ id: string }>();
   const songId = params.id;
-  const [currentSongId, setCurrentSongId] = useAtom(currentSongIdAtom);
+
+  const currentSongId = useCurrentSongId();
+  const setCurrentSongId = useSetCurrentSongIdAtom();
 
   // Point the editor's songAtom at the persisted song for this route.
   useEffect(() => {
     if (songId) {
       setCurrentSongId(songId);
     }
+
     return () => {
       setCurrentSongId(null);
     };

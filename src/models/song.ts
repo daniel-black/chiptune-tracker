@@ -1,13 +1,12 @@
 import { nowIso } from "@/utils/format";
 import type {
-  CellPosition,
   NoiseCell,
   PersistedSong,
   PulseCell,
   Row,
-  Song,
+  Pattern,
 } from "../types";
-import { rows } from "./constants";
+import { rows } from "@/audio/constants";
 
 export function createDefaultPulseCell(): PulseCell {
   return {
@@ -35,25 +34,8 @@ export function createDefaultRow(): Row {
   ];
 }
 
-export function createDefaultSong(): Song {
+export function createDefaultPattern(): Pattern {
   return Array.from({ length: rows }, createDefaultRow);
-}
-
-export const cellKey = (rowIndex: number, columnIndex: number) =>
-  `${rowIndex}:${columnIndex}` as const;
-
-export function parseCellKey(cellKey: string): CellPosition {
-  const [r, c] = cellKey.split(":");
-  const row = Number(r);
-  const col = Number(c);
-
-  if (!Number.isInteger(row) || row < 0 || row >= rows) {
-    throw new Error(`Invalid row in cell key: "${cellKey}"`);
-  }
-  if (![0, 1, 2, 3].includes(col)) {
-    throw new Error(`Invalid col in cell key: "${cellKey}"`);
-  }
-  return { rowIndex: row, columnIndex: col };
 }
 
 export function createNewPersistedSong(uuid: string): PersistedSong {
@@ -64,6 +46,6 @@ export function createNewPersistedSong(uuid: string): PersistedSong {
     id: uuid,
     createdAt: now,
     updatedAt: now,
-    pattern: createDefaultSong(),
+    pattern: createDefaultPattern(),
   };
 }

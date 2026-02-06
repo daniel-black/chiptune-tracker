@@ -1,18 +1,16 @@
-import { rows } from "@/audio/constants";
+import { defaultRange, rows } from "@/audio/constants";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { atomFamily } from "jotai-family";
 import { playheadAtom } from "./playhead";
 
 type Range = { start: number; end: number };
 
-const defaultRange: Range = { start: 0, end: 63 } as const;
-
 export const playbackRangeAtom = atom<Range>(defaultRange);
 
 export const isDefaultRangeSelectedAtom = atom((get) => {
   const { start, end } = get(playbackRangeAtom);
 
-  return start === 0 && end === rows - 1;
+  return start === defaultRange.start && end === defaultRange.end;
 });
 
 const isInPlaybackRangeAtomFamily = atomFamily((rowIndex: number) =>
@@ -26,9 +24,9 @@ export function useIsRowInPlaybackRange(rowIndex: number) {
   return useAtomValue(isInPlaybackRangeAtomFamily(rowIndex));
 }
 
-const resetPlaybackRangeAtom = atom(null, (get, set) => {
+export const resetPlaybackRangeAtom = atom(null, (get, set) => {
   const range = get(playbackRangeAtom);
-  if (range.start !== 0 || range.end !== rows - 1) {
+  if (range.start !== defaultRange.start || range.end !== defaultRange.end) {
     set(playbackRangeAtom, defaultRange);
   }
 });
@@ -46,8 +44,8 @@ export const setStartOfPlaybackRangeAtom = atom(
     const range = get(playbackRangeAtom);
 
     if (
-      start >= 0 &&
-      start < rows - 2 && // need at least one row for an end of range
+      start >= defaultRange.start &&
+      start < defaultRange.end - 1 && // need at least one row for an end of range
       range.start !== start &&
       start < range.end
     ) {

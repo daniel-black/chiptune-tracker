@@ -1,94 +1,100 @@
-import { atom, useAtom } from "jotai";
-import type {
-  NoiseCell,
-  PulseCell,
-  Song,
-  SynthesizedNoiseCell,
-  SynthesizedPulseCell,
-  SynthesizedRow,
-} from "../types";
-import { createDefaultSong } from "../audio/utils";
-
-import { getNoteFrequency } from "../audio/notes";
-import { getDutyValue } from "../audio/duty";
-import { getVolume } from "../audio/volume";
-import { getRateValue } from "../audio/rate";
-import { playheadAtom } from "../features/playback/atoms/playhead";
-import { songAtomFamily } from "./library";
+import { resetPlaybackRangeAtom } from "@/features/playback/atoms/range";
+import { playheadAtom } from "@/features/playback/atoms/playhead";
+import type { PersistedSong } from "@/types";
 import { nowIso } from "@/utils/format";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import { atomFamily } from "jotai-family";
+import { atomWithStorage, createJSONStorage } from "jotai/utils";
+import { stopPlaybackAtom } from "@/features/playback/atoms/playback";
+import { createNewPersistedSong } from "@/models/song";
 
-/** UUID of the song currently open in the editor (set by TrackerPage). */
+const songStorage = createJSONStorage<PersistedSong>(() => localStorage);
+const indexStorage = createJSONStorage<string[]>(() => localStorage);
+
+/** Memoized atom family — same uuid always returns the same atom instance. */
+export const songAtomFamily = atomFamily((uuid: string) =>
+  atomWithStorage<PersistedSong>(
+    `song:${uuid}`,
+    createNewPersistedSong(uuid),
+    songStorage,
+    { getOnInit: true },
+  ),
+);
+
+/** Index in localStorage for keeping track of existing songs */
+export const songIndexAtom = atomWithStorage<string[]>(
+  "songIndex",
+  [],
+  indexStorage,
+);
+
+/** UUID of the song currently open in the editor. Null if not on editor page */
 export const currentSongIdAtom = atom<string | null>(null);
 
-/**
- * Derived read/write atom that transparently delegates to the persisted
- * song identified by `currentSongIdAtom`. All existing editor code that
- * reads/writes `songAtom` continues to work unchanged.
- */
-export const songAtom = atom(
-  (get): Song => {
-    const id = get(currentSongIdAtom);
-    if (!id) return createDefaultSong();
-    return get(songAtomFamily(id)).pattern;
-  },
-  (get, set, newSong: Song) => {
-    const id = get(currentSongIdAtom);
-    if (!id) return;
-    const prev = get(songAtomFamily(id));
-    set(songAtomFamily(id), {
-      ...prev,
-      pattern: newSong,
-      updatedAt: nowIso(),
-    });
+export const setCurrentSongIdAtom = atom(
+  null,
+  (get, set, uuid: string | null) => {
+    if (get(currentSongIdAtom) !== uuid) {
+      set(currentSongIdAtom, uuid);
+      set(stopPlaybackAtom);
+      set(resetPlaybackRangeAtom);
+      set(playheadAtom, 0);
+    }
   },
 );
 
-export const playheadRowAtom = atom((get) => {
-  const playhead = get(playheadAtom);
-  const song = get(songAtom);
-
-  return song[playhead];
-});
-
-export const synthesizedPlayheadRow = atom<SynthesizedRow>((get) => {
-  const playhead = get(playheadAtom);
-  const song = get(songAtom);
-  const row = song[playhead];
-
-  return [
-    synthesizePulseCell(row[0]),
-    synthesizePulseCell(row[1]),
-    synthesizePulseCell(row[2]),
-    synthesizeNoiseCell(row[3]),
-  ] as const;
-});
-
-function synthesizePulseCell(pulse: PulseCell): SynthesizedPulseCell {
-  return {
-    kind: "pulse",
-    frequency: getNoteFrequency(pulse.note),
-    duty: getDutyValue(pulse.duty),
-    gain: getVolume(pulse.volume.toString()),
-  };
+export function useSetCurrentSongIdAtom() {
+  return useSetAtom(setCurrentSongIdAtom);
 }
 
-function synthesizeNoiseCell(noise: NoiseCell): SynthesizedNoiseCell {
-  return {
-    kind: "noise",
-    rate: getRateValue(noise.rate),
-    gain: getVolume(noise.volume.toString()),
-  };
+export function useCurrentSongId() {
+  return useAtomValue(currentSongIdAtom);
+}
+
+/** Atom for creating a new, persisted song and adding it to the index */
+const createNewSongAtom = atom(null, (get, set, uuid: string) => {
+  set(songAtomFamily(uuid), createNewPersistedSong(uuid));
+  const index = get(songIndexAtom);
+  if (!index.includes(uuid)) {
+    set(songIndexAtom, [...index, uuid]);
+  }
+});
+
+export function useCreateNewSong() {
+  return useSetAtom(createNewSongAtom);
+}
+
+const deleteSongAtom = atom(null, (get, set, uuid: string) => {
+  // Remove from index
+  const index = get(songIndexAtom);
+  set(
+    songIndexAtom,
+    index.filter((id) => id !== uuid),
+  );
+
+  localStorage.removeItem(`song:${uuid}`);
+  songAtomFamily.remove(uuid);
+});
+
+export function useDeleteSong() {
+  return useSetAtom(deleteSongAtom);
 }
 
 const songNameAtom = atom(
   (get): string => {
     const id = get(currentSongIdAtom);
-    if (!id) return "";
+    if (!id) {
+      return "";
+    }
+
     return get(songAtomFamily(id)).name;
   },
   (get, set, name: string) => {
     const id = get(currentSongIdAtom);
-    if (!id) return;
+    if (!id) {
+      return;
+    }
+
     const prev = get(songAtomFamily(id));
     set(songAtomFamily(id), {
       ...prev,

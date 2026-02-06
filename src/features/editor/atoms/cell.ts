@@ -1,8 +1,8 @@
 import { atom, useAtom } from "jotai";
 import { atomFamily } from "jotai-family";
-import { cellKey, parseCellKey } from "../../../audio/utils";
-import { songAtom } from "../../../atoms/song";
+import { patternAtom } from "../../../atoms/pattern";
 import type { NoiseCell, PulseCell, Row } from "../../../types";
+import { cellKey, parseCellKey } from "../utils";
 
 type SetStateAction<T> = T | ((prev: T) => T);
 
@@ -15,21 +15,21 @@ export const pulseCellAtomFamily = atomFamily((key: string) =>
           "pulseCellAtomFamily cannot be used for column 3 (noise column)",
         );
       }
-      return get(songAtom)[rowIndex][columnIndex] as PulseCell;
+      return get(patternAtom)[rowIndex][columnIndex] as PulseCell;
     },
     (get, set, action: SetStateAction<PulseCell>) => {
       const { rowIndex, columnIndex } = parseCellKey(key);
 
-      const song = get(songAtom);
-      const prevCell = song[rowIndex][columnIndex] as PulseCell;
+      const pattern = get(patternAtom);
+      const prevCell = pattern[rowIndex][columnIndex] as PulseCell;
       const nextCell = typeof action === "function" ? action(prevCell) : action;
 
-      const nextSong = song.slice();
-      const nextRow = nextSong[rowIndex].slice();
+      const nextPattern = pattern.slice();
+      const nextRow = nextPattern[rowIndex].slice();
       nextRow[columnIndex] = nextCell;
-      nextSong[rowIndex] = nextRow as Row;
+      nextPattern[rowIndex] = nextRow as Row;
 
-      set(songAtom, nextSong);
+      set(patternAtom, nextPattern);
     },
   ),
 );
@@ -62,21 +62,21 @@ export const noiseCellAtomFamily = atomFamily((key: string) =>
       if (columnIndex !== 3) {
         throw new Error("noiseCellAtomFamily can only be used for column 3");
       }
-      return get(songAtom)[rowIndex][columnIndex] as NoiseCell;
+      return get(patternAtom)[rowIndex][columnIndex] as NoiseCell;
     },
     (get, set, action: SetStateAction<NoiseCell>) => {
       const { rowIndex, columnIndex } = parseCellKey(key);
 
-      const song = get(songAtom);
-      const prevCell = song[rowIndex][columnIndex] as NoiseCell;
+      const pattern = get(patternAtom);
+      const prevCell = pattern[rowIndex][columnIndex] as NoiseCell;
       const nextCell = typeof action === "function" ? action(prevCell) : action;
 
-      const nextSong = song.slice();
-      const nextRow = nextSong[rowIndex].slice();
+      const nextPattern = pattern.slice();
+      const nextRow = nextPattern[rowIndex].slice();
       nextRow[columnIndex] = nextCell;
-      nextSong[rowIndex] = nextRow as Row;
+      nextPattern[rowIndex] = nextRow as Row;
 
-      set(songAtom, nextSong);
+      set(patternAtom, nextPattern);
     },
   ),
 );

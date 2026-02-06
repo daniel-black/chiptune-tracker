@@ -40,7 +40,7 @@ export type SynthesizedRow = [
   SynthesizedNoiseCell,
 ];
 
-export type Song = Array<Row>; // 64 rows
+export type Pattern = Array<Row>; // 64 rows
 
 export type CellPosition = { rowIndex: number; columnIndex: number };
 
@@ -49,5 +49,5 @@ export type PersistedSong = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  pattern: Array<Row>;
+  pattern: Pattern;
 };
