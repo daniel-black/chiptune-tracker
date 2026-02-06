@@ -7,12 +7,18 @@ type Range = { start: number; end: number };
 
 export const playbackRangeAtom = atom<Range>(defaultRange);
 
+/**
+ * Default range is the whole pattern (0 to 63). This is what is
+ * 'selected' by default. Don't want to clutter the user interface
+ * w/ selected range highlights if they're just playing top to bottom.
+ */
 export const isDefaultRangeSelectedAtom = atom((get) => {
   const { start, end } = get(playbackRangeAtom);
 
   return start === defaultRange.start && end === defaultRange.end;
 });
 
+/** So that each row can get a simple, yes-no answer as to whether they are in range. */
 const isInPlaybackRangeAtomFamily = atomFamily((rowIndex: number) =>
   atom((get) => {
     const { start, end } = get(playbackRangeAtom);
@@ -24,6 +30,7 @@ export function useIsRowInPlaybackRange(rowIndex: number) {
   return useAtomValue(isInPlaybackRangeAtomFamily(rowIndex));
 }
 
+/** Atom for resetting the range to the default */
 export const resetPlaybackRangeAtom = atom(null, (get, set) => {
   const range = get(playbackRangeAtom);
   if (range.start !== defaultRange.start || range.end !== defaultRange.end) {
@@ -74,7 +81,7 @@ export const setEndOfPlaybackRangeAtom = atom(null, (get, set, end: number) => {
 const canRowBeStartOfRangeFamily = atomFamily((rowIndex: number) =>
   atom((get) => {
     const range = get(playbackRangeAtom);
-    return rowIndex !== range.start && rowIndex < range.end;
+    return rowIndex < range.end;
   }),
 );
 
@@ -85,7 +92,7 @@ export function useCanRowBeStartOfRange(rowIndex: number) {
 const canRowBeEndOfRangeFamily = atomFamily((rowIndex: number) =>
   atom((get) => {
     const range = get(playbackRangeAtom);
-    return rowIndex !== range.end && rowIndex > range.start;
+    return rowIndex > range.start;
   }),
 );
 

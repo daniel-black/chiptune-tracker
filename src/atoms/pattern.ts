@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import type { Pattern, SynthesizedRow } from "../types";
-import { playheadAtom } from "../features/playback/atoms/playhead";
+import { playheadAtom } from "@/features/playback/atoms/playhead";
 import { currentSongIdAtom, songAtomFamily } from "./song";
 import { nowIso } from "@/utils/format";
 import { createDefaultPattern } from "@/models/song";
