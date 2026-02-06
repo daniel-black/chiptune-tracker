@@ -35,3 +35,20 @@ const createNewSongAtom = atom(null, (get, set, uuid: string) => {
 export function useCreateNewSong() {
   return useSetAtom(createNewSongAtom);
 }
+
+const deleteSongAtom = atom(null, (get, set, uuid: string) => {
+  // Remove from index
+  const index = get(songIndexAtom);
+  set(
+    songIndexAtom,
+    index.filter((id) => id !== uuid),
+  );
+  // Remove from localStorage
+  localStorage.removeItem(`song:${uuid}`);
+  // Remove from atom family cache
+  songAtomFamily.remove(uuid);
+});
+
+export function useDeleteSong() {
+  return useSetAtom(deleteSongAtom);
+}
