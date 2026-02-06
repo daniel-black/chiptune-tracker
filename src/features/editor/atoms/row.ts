@@ -15,16 +15,15 @@ const rowStyleAtomFamily = atomFamily((rowIndex: number) =>
     }
 
     const showPlayhead = get(canStopPlaybackAtom);
-
-    // transparent if whole range selected and playback is stopped
-    if (range.start === 0 && range.end === rows - 1 && !showPlayhead) {
-      return "bg-transparent hover:bg-background/50";
-    }
-
     const playhead = get(playheadAtom);
 
     if (rowIndex === playhead && showPlayhead) {
       return "bg-primary/80 hover:bg-primary/90";
+    }
+
+    // no range highlight when the whole pattern is selected
+    if (range.start === 0 && range.end === rows - 1) {
+      return "bg-transparent hover:bg-background/50";
     }
 
     return "bg-primary/50 hover:bg-primary/60";
