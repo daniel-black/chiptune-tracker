@@ -56,14 +56,14 @@ export function parseCellKey(cellKey: string): CellPosition {
   return { rowIndex: row, columnIndex: col };
 }
 
-export function createNewPersistedSong(): PersistedSong {
+export function createNewPersistedSong(uuid: string): PersistedSong {
   const now = nowIso();
 
   return {
     name: "",
-    id: crypto.randomUUID(),
+    id: uuid,
     createdAt: now,
     updatedAt: now,
-    pattern: createDefaultSong(), // rename this eventually
+    pattern: createDefaultSong(),
   };
 }

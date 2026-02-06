@@ -1,4 +1,5 @@
 import { rows } from "@/audio/constants";
+import { currentSongIdAtom } from "@/atoms/song";
 import { initAudioOnce, stopSubscriptions } from "@/bootstrap";
 import { Editor } from "@/features/editor/components/editor";
 import { EditorBody } from "@/features/editor/components/editor-body";
@@ -8,6 +9,7 @@ import { InputExplanation } from "@/features/panel/components/input-explanation"
 import { Panel } from "@/features/panel/components/panel";
 import { PanelControls } from "@/features/panel/components/panel-controls";
 import { SongNameForm } from "@/features/panel/components/song-name-form";
+import { useAtom } from "jotai";
 import { useEffect } from "react";
 import { Navigate, useParams } from "react-router";
 
@@ -16,6 +18,17 @@ const rowArray = Array.from({ length: rows }, (_, i) => i);
 export function TrackerPage() {
   const params = useParams<{ id: string }>();
   const songId = params.id;
+  const [currentSongId, setCurrentSongId] = useAtom(currentSongIdAtom);
+
+  // Point the editor's songAtom at the persisted song for this route.
+  useEffect(() => {
+    if (songId) {
+      setCurrentSongId(songId);
+    }
+    return () => {
+      setCurrentSongId(null);
+    };
+  }, [songId, setCurrentSongId]);
 
   useEffect(() => {
     initAudioOnce();
@@ -26,6 +39,11 @@ export function TrackerPage() {
   }, []);
 
   if (!songId) return <Navigate to="/" replace />;
+
+  // Don't render the editor until currentSongIdAtom matches the URL param.
+  // The effect above runs after the first render, so without this guard the
+  // editor would briefly mount with songAtom pointing at a blank default song.
+  if (currentSongId !== songId) return null;
 
   return (
     <div className="flex">
