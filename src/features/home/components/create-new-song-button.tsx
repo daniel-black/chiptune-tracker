@@ -15,7 +15,7 @@ export function CreateNewSongButton() {
 
   return (
     <Button
-      className="p-5 text-xl font-mono tracking-tight font-semibold flex items-center gap-2.5"
+      className="p-4 md:p-5 text-lg md:text-xl font-mono tracking-tight font-semibold flex items-center gap-2.5"
       onClick={handleCreateNewSong}
     >
       <span>NEW</span>

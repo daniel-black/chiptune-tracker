@@ -16,12 +16,12 @@ export function SongListItem({ uuid }: { uuid: string }) {
     <li>
       <Link
         to={`/editor/${uuid}`}
-        className="flex items-center justify-between rounded-md border px-4 py-3 font-mono transition-colors hover:bg-accent"
+        className="flex flex-col sm:flex-row items-left sm:items-center justify-between rounded-md border px-4 py-3 font-mono transition-colors hover:bg-accent"
       >
         <span className="font-semibold truncate">
           {song.name || "Untitled"}
         </span>
-        <div className="flex items-center gap-3 shrink-0 ml-4">
+        <div className="flex items-center justify-between gap-3 shrink-0">
           <span className="text-muted-foreground text-xs">
             {new Date(song.updatedAt).toLocaleDateString()}
           </span>

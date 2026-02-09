@@ -9,13 +9,13 @@ export function HomePage() {
 
   return (
     <div className="h-full">
-      <div className="max-w-3xl mx-auto my-20 space-y-16">
-        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight text-balance font-mono">
+      <div className="max-w-3xl px-4 md:px-0 mx-auto my-20 space-y-16">
+        <h1 className="scroll-m-20 text-2xl md:text-4xl font-extrabold tracking-tight text-balance font-mono">
           Chiptunes
         </h1>
         <div className="space-y-6">
           <div className="flex justify-between">
-            <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight font-mono">
+            <h3 className="scroll-m-20 text-lg md:text-2xl font-semibold tracking-tight font-mono">
               Songs
             </h3>
             <CreateNewSongButton />
