@@ -37,3 +37,12 @@ export const pausePlaybackAtom = atom(null, (get, set) => {
     set(playbackStatusAtom, "paused");
   }
 });
+
+export const togglePlaybackAtom = atom(null, (get, set) => {
+  const status = get(playbackStatusAtom);
+  if (status === "playing") {
+    set(pausePlaybackAtom);
+  } else {
+    set(startPlaybackAtom);
+  }
+});

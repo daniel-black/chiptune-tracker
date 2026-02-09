@@ -1,16 +1,19 @@
 import { useCreateNewSong } from "@/atoms/song";
 import { Button } from "@/components/ui/button";
+import { useHotkeys } from "react-hotkeys-hook";
 import { Link, useNavigate } from "react-router";
 
 export function NotFoundPage() {
   const navigate = useNavigate();
   const createSong = useCreateNewSong();
 
-  const handleCreateNewSong = () => {
+  useHotkeys("ctrl+n", handleCreateNewSong);
+
+  function handleCreateNewSong() {
     const uuid = crypto.randomUUID();
     createSong(uuid); // persists via atomWithStorage
     navigate(`/editor/${uuid}`); // go to editor
-  };
+  }
 
   return (
     <div className="h-full">

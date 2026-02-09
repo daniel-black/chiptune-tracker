@@ -15,6 +15,7 @@ export function SongNameForm() {
         Song name
       </Label>
       <Input
+        autoFocus
         value={name}
         onChange={handleChange}
         id="song-name"
