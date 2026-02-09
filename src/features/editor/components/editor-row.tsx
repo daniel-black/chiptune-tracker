@@ -35,7 +35,7 @@ function RowWrapper({
   const cn = useRowStyle(rowIndex);
 
   return (
-    <tr className={`border-b ${cn} transition-all duration-10 ease-linear`}>
+    <tr data-row={rowIndex} className={`border-b ${cn} transition-all duration-10 ease-linear`}>
       {children}
     </tr>
   );

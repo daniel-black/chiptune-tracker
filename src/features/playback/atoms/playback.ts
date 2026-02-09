@@ -1,4 +1,5 @@
 import { atom } from "jotai";
+import { autoScrollAtom } from "./auto-scroll";
 import { playheadAtom } from "./playhead";
 import { playbackRangeAtom } from "./range";
 
@@ -21,6 +22,7 @@ export const canPausePlaybackAtom = atom((get) => {
 export const startPlaybackAtom = atom(null, (get, set) => {
   const status = get(playbackStatusAtom);
   if (status !== "playing") {
+    set(autoScrollAtom, true); // re-enable auto-scroll on play
     set(playbackStatusAtom, "playing");
   }
 });

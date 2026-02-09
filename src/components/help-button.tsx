@@ -94,7 +94,11 @@ export function HelpButton() {
       <Tooltip>
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
-            <Button variant="ghost" size="icon-lg" className="w-full h-10">
+            <Button
+              variant="ghost"
+              size="icon-lg"
+              className="w-full h-10 text-muted-foreground"
+            >
               <HelpCircleIcon />
             </Button>
           </DialogTrigger>
