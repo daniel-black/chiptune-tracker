@@ -73,6 +73,7 @@ export function RateInput({ rate, setRate }: RateInputProps) {
   return (
     <TextInput
       editorInputType="rate"
+      field={0}
       value={localRate}
       onKeyDown={handleKeyDown}
       onChange={handleChange}

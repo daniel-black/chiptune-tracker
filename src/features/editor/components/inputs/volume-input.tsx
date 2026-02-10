@@ -7,9 +7,10 @@ import { padNumberTwoDigit } from "@/utils/format";
 type VolumeInputProps = {
   volume: Cell["volume"];
   setVolume: (volume: Cell["volume"]) => void;
+  field: number;
 };
 
-export function VolumeInput({ volume, setVolume }: VolumeInputProps) {
+export function VolumeInput({ volume, setVolume, field }: VolumeInputProps) {
   // Local state for holding value during editing
   const [localVolume, setLocalVolume] = useState<string>(
     volume !== "--" ? padNumberTwoDigit(volume) : volume,
@@ -67,6 +68,7 @@ export function VolumeInput({ volume, setVolume }: VolumeInputProps) {
   return (
     <TextInput
       editorInputType="volume"
+      field={field}
       value={localVolume}
       onKeyDown={handleKeyDown}
       onChange={handleChange}

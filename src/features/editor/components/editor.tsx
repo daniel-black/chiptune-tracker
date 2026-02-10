@@ -9,7 +9,6 @@ import {
 import { loopAtom } from "@/features/playback/atoms/loop";
 import { autoScrollAtom } from "@/features/playback/atoms/auto-scroll";
 import { playheadAtom } from "@/features/playback/atoms/playhead";
-
 export function Editor({ children }: { children: React.ReactNode }) {
   const togglePlayback = useSetAtom(togglePlaybackAtom);
   const stopPlayback = useSetAtom(stopPlaybackAtom);

@@ -18,7 +18,7 @@ export function PulseCell({ rowIndex, columnIndex }: PulseCellProps) {
     <>
       <NoteInput note={pulseCell.note} setNote={setNote} />
       <DutyInput duty={pulseCell.duty} setDuty={setDuty} />
-      <VolumeInput volume={pulseCell.volume} setVolume={setVolume} />
+      <VolumeInput volume={pulseCell.volume} setVolume={setVolume} field={2} />
     </>
   );
 }

@@ -3,6 +3,7 @@ import { isDuty } from "@/audio/characteristics/duty";
 import { TextInput } from "./text-input";
 import type { PulseCell } from "@/models/pulse-cell";
 
+
 function isValidFirstLetterForDuty(value: string) {
   return /^[1257-]$/.test(value);
 }
@@ -58,6 +59,7 @@ export function DutyInput({ duty, setDuty }: DutyInputProps) {
   return (
     <TextInput
       editorInputType="duty"
+      field={1}
       value={localDuty}
       onKeyDown={handleKeyDown}
       onChange={handleChange}

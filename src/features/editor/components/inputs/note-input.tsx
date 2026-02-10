@@ -2,6 +2,7 @@ import { useState } from "react";
 import { TextInput } from "./text-input";
 import { isMusicalNote, type MusicalNote } from "@/audio/characteristics/notes";
 import type { PulseCell } from "@/models/pulse-cell";
+import { advanceDown } from "../../utils/navigation";
 
 function isValidPitch(value: string): boolean {
   return /^[a-g]$/i.test(value);
@@ -41,12 +42,14 @@ export function NoteInput({ note, setNote }: NoteInputProps) {
     if (e.key === "o") {
       setNote("OFF");
       setLocalNote("OFF");
+      advanceDown();
       return;
     }
 
     if (localNote.length !== 1 && e.key === "-") {
       setNote("---");
       setLocalNote("---");
+      advanceDown();
       return;
     }
   }
@@ -73,6 +76,7 @@ export function NoteInput({ note, setNote }: NoteInputProps) {
         const newNote = `${pitch}-${secondChar}` as MusicalNote;
         setNote(newNote);
         setLocalNote(newNote);
+        advanceDown();
         return;
       }
 
@@ -89,6 +93,7 @@ export function NoteInput({ note, setNote }: NoteInputProps) {
     if (value.length === 3 && isMusicalNote(value)) {
       setNote(value);
       setLocalNote(value);
+      advanceDown();
     }
   }
 
@@ -102,6 +107,7 @@ export function NoteInput({ note, setNote }: NoteInputProps) {
   return (
     <TextInput
       editorInputType="note"
+      field={0}
       value={localNote}
       onKeyDown={handleKeyDown}
       onChange={handleChange}

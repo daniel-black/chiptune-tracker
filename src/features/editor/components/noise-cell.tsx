@@ -13,7 +13,7 @@ export function NoiseCell({ rowIndex, columnIndex }: NoiseCellProps) {
   return (
     <>
       <RateInput rate={noiseCell.rate} setRate={setRate} />
-      <VolumeInput volume={noiseCell.volume} setVolume={setVolume} />
+      <VolumeInput volume={noiseCell.volume} setVolume={setVolume} field={1} />
     </>
   );
 }

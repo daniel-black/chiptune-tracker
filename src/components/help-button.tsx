@@ -41,6 +41,8 @@ function EditorHelpContent() {
       <DialogDescription asChild>
         <div className="space-y-3">
           <p>Use these shortcuts while editing a song</p>
+
+          <p className="font-semibold text-foreground text-sm">Playback</p>
           <ul className="space-y-2">
             <li className="flex items-center justify-between">
               <span>Toggle playback</span>
@@ -59,6 +61,35 @@ function EditorHelpContent() {
               <span>
                 <Kbd>Ctrl</Kbd> + <Kbd>L</Kbd>
               </span>
+            </li>
+          </ul>
+
+          <p className="font-semibold text-foreground text-sm">Navigation</p>
+          <ul className="space-y-2">
+            <li className="flex items-center justify-between">
+              <span>Move between rows</span>
+              <span>
+                <Kbd>&uarr;</Kbd> <Kbd>&darr;</Kbd>
+              </span>
+            </li>
+            <li className="flex items-center justify-between">
+              <span>Move between fields</span>
+              <span>
+                <Kbd>&larr;</Kbd> <Kbd>&rarr;</Kbd>
+              </span>
+            </li>
+            <li className="flex items-center justify-between">
+              <span>Deselect field</span>
+              <span>
+                <Kbd>Esc</Kbd>
+              </span>
+            </li>
+          </ul>
+
+          <p className="font-semibold text-foreground text-sm">Editing</p>
+          <ul className="space-y-2">
+            <li className="flex items-center justify-between">
+              <span>Note fields auto-advance to the next row</span>
             </li>
           </ul>
         </div>
