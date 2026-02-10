@@ -8,10 +8,13 @@ import { atomFamily } from "jotai-family";
 const rowStyleAtomFamily = atomFamily((rowIndex: number) =>
   atom((get) => {
     const range = get(playbackRangeAtom);
+    const striped = rowIndex % 4 === 0;
 
     // transparent if out of range
     if (rowIndex < range.start || rowIndex > range.end) {
-      return "bg-transparent hover:bg-background/50";
+      return striped
+        ? "bg-foreground/[0.035] hover:bg-background/50"
+        : "bg-transparent hover:bg-background/50";
     }
 
     const showPlayhead = get(canStopPlaybackAtom);
@@ -23,10 +26,14 @@ const rowStyleAtomFamily = atomFamily((rowIndex: number) =>
 
     // no range highlight when the whole pattern is selected
     if (range.start === defaultRange.start && range.end === defaultRange.end) {
-      return "bg-transparent hover:bg-background/50";
+      return striped
+        ? "bg-foreground/[0.035] hover:bg-background/50"
+        : "bg-transparent hover:bg-background/50";
     }
 
-    return "bg-primary/50 hover:bg-primary/60";
+    return striped
+      ? "bg-primary/[0.43] hover:bg-primary/[0.53]"
+      : "bg-primary/50 hover:bg-primary/60";
   }),
 );
 
