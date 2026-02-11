@@ -1,4 +1,5 @@
 import type { Store } from "jotai/vanilla/store";
+import type { Channel } from "./channels/channel";
 import { NoiseChannel } from "./channels/noise-channel";
 import { PulseChannel } from "./channels/pulse-channel";
 import { synthesizedPlayheadRowAtom } from "@/atoms/pattern";
@@ -14,12 +15,7 @@ export class AudioEngine {
   private readonly ctx: AudioContext;
   private readonly masterGainNode: GainNode;
 
-  private readonly channels: [
-    PulseChannel,
-    PulseChannel,
-    PulseChannel,
-    NoiseChannel,
-  ];
+  private readonly channels: Channel[];
 
   private readonly schedulingIntervalMs = 50; // schedule next notes every 50ms
   private readonly rowsPerBeat = 4;
@@ -154,22 +150,11 @@ export class AudioEngine {
     const enabled = this.store.get(channelEnableBaseAtom);
 
     for (let i = 0; i < row.length; i++) {
-      const audio = row[i];
-      const isEnabled = enabled[i];
       const channel = this.channels[i];
 
-      if (audio.kind === "pulse" && channel instanceof PulseChannel) {
-        channel.setFrequencyAtTime(audio.frequency, time);
-        channel.changeWaveShape(audio.duty);
-      }
+      channel.scheduleCell(row[i], time);
 
-      if (audio.kind === "noise" && channel instanceof NoiseChannel) {
-        channel.setRateAtTime(audio.rate, time);
-      }
-
-      channel.setVolumeAtTime(audio.gain, time);
-
-      if (isEnabled) {
+      if (enabled[i]) {
         channel.unmuteAtTime(time);
       } else {
         channel.muteAtTime(time);
@@ -216,16 +201,8 @@ export class AudioEngine {
   }
 
   private silenceAllChannels(): void {
-    this.channels.forEach((channel) => {
-      const now = this.ctx.currentTime;
-      channel.cancelScheduledGainValues(now);
-      channel.setVolumeAtTime(0, now);
-
-      if (channel instanceof PulseChannel) {
-        channel.cancelScheduledFrequencyValues(now);
-        channel.setFrequencyAtTime(0, now);
-      }
-    });
+    const now = this.ctx.currentTime;
+    this.channels.forEach((channel) => channel.silence(now));
   }
 
   public stopSubscriptions(): void {

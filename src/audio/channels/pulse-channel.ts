@@ -1,64 +1,78 @@
 import type { DutyValue } from "../characteristics/duty";
 import { getWaveShaperCurve } from "../wave-shaper";
+import { Channel, type SynthesizedCell } from "./channel";
 
-export class PulseChannel {
+const dutyValues = [0.125, 0.25, 0.5, 0.75] as const;
+const defaultDuty = 0.5;
+
+export class PulseChannel extends Channel {
   private readonly source: OscillatorNode;
-  private readonly waveShaper: WaveShaperNode;
-  private readonly gain: GainNode;
-  private readonly gate: GainNode;
+  private readonly dutyBranches: Map<number, GainNode>;
 
   constructor(audioContext: AudioContext, masterGain: GainNode) {
+    super(masterGain, audioContext);
+
     this.source = new OscillatorNode(audioContext, { type: "sawtooth" });
-    this.waveShaper = new WaveShaperNode(audioContext, {
-      curve: getWaveShaperCurve(0.5), // default to half-off, half-on pulse wave
-    });
-    this.gain = new GainNode(audioContext, { gain: 0 });
-    this.gate = new GainNode(audioContext, { gain: 1 });
 
-    // wire up the audio graph
-    this.source.connect(this.waveShaper);
-    this.waveShaper.connect(this.gain);
-    this.gain.connect(this.gate);
+    // Create one waveshaper + gain pair per duty cycle
+    this.dutyBranches = new Map();
+    for (const duty of dutyValues) {
+      const shaper = new WaveShaperNode(audioContext, {
+        curve: getWaveShaperCurve(duty),
+      });
+      const branchGain = new GainNode(audioContext, {
+        gain: duty === defaultDuty ? 1 : 0,
+      });
 
-    // finally, connect the output of the channel to the master gain node
-    this.gate.connect(masterGain);
+      this.source.connect(shaper);
+      shaper.connect(branchGain);
+      branchGain.connect(this.gain);
+
+      this.dutyBranches.set(duty, branchGain);
+    }
   }
 
   public start(): void {
     this.source.start();
   }
 
-  public muteAtTime(time: number): void {
-    this.gate.gain.setValueAtTime(0, time);
+  public scheduleCell(cell: SynthesizedCell, time: number): void {
+    if (cell.kind !== "pulse") return;
+
+    this.setFrequencyAtTime(cell.frequency, time);
+    this.setDutyAtTime(cell.duty, time);
+    this.setVolumeAtTime(cell.gain, time);
   }
 
-  public unmuteAtTime(time: number): void {
-    this.gate.gain.setValueAtTime(1, time);
+  public silence(time: number): void {
+    this.cancelScheduledGainValues(time);
+    this.setVolumeAtTime(0, time);
+    this.cancelScheduledFrequencyValues(time);
+    this.setFrequencyAtTime(0, time);
+    this.cancelScheduledDutyValues(time);
   }
 
-  public setVolumeAtTime(volume: number, time: number): void {
-    if (volume >= 0 && volume <= 1) {
-      this.gain.gain.setValueAtTime(volume, time);
-    }
-  }
-
-  public cancelScheduledGainValues(time: number): void {
-    this.gain.gain.cancelScheduledValues(time);
-  }
-
-  public cancelScheduledFrequencyValues(time: number): void {
+  private cancelScheduledFrequencyValues(time: number): void {
     this.source.frequency.cancelScheduledValues(time);
   }
 
-  public setFrequencyAtTime(frequency: number, time: number): void {
+  private cancelScheduledDutyValues(time: number): void {
+    for (const branchGain of this.dutyBranches.values()) {
+      branchGain.gain.cancelScheduledValues(time);
+    }
+  }
+
+  private setFrequencyAtTime(frequency: number, time: number): void {
     if (frequency >= 0) {
       this.source.frequency.setValueAtTime(frequency, time);
     }
   }
 
-  public changeWaveShape(duty: DutyValue): void {
-    if (duty !== -1) {
-      this.waveShaper.curve = getWaveShaperCurve(duty);
+  private setDutyAtTime(duty: DutyValue, time: number): void {
+    if (duty === -1) return;
+
+    for (const [dutyValue, branchGain] of this.dutyBranches) {
+      branchGain.gain.setValueAtTime(dutyValue === duty ? 1 : 0, time);
     }
   }
 }

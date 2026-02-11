@@ -1,49 +1,39 @@
-export class NoiseChannel {
+import { Channel, type SynthesizedCell } from "./channel";
+
+export class NoiseChannel extends Channel {
   private readonly source: AudioBufferSourceNode;
-  private readonly gain: GainNode;
-  private readonly gate: GainNode;
 
   constructor(audioContext: AudioContext, masterGain: GainNode) {
+    super(masterGain, audioContext);
+
     const buffer = this.createBuffer(audioContext);
 
     this.source = new AudioBufferSourceNode(audioContext, {
       buffer,
       loop: true,
     });
-    this.gain = new GainNode(audioContext, { gain: 0 });
-    this.gate = new GainNode(audioContext, { gain: 1 });
 
-    // wire up audio graph
+    // wire source to the gain stage from the base class
     this.source.connect(this.gain);
-    this.gain.connect(this.gate);
-
-    // connect output to master gain node
-    this.gate.connect(masterGain);
   }
 
   public start(): void {
     this.source.start();
   }
 
-  public muteAtTime(time: number): void {
-    this.gate.gain.setValueAtTime(0, time);
+  public scheduleCell(cell: SynthesizedCell, time: number): void {
+    if (cell.kind !== "noise") return;
+
+    this.setRateAtTime(cell.rate, time);
+    this.setVolumeAtTime(cell.gain, time);
   }
 
-  public unmuteAtTime(time: number): void {
-    this.gate.gain.setValueAtTime(1, time);
+  public silence(time: number): void {
+    this.cancelScheduledGainValues(time);
+    this.setVolumeAtTime(0, time);
   }
 
-  public setVolumeAtTime(volume: number, time: number): void {
-    if (volume >= 0 && volume <= 1) {
-      this.gain.gain.setValueAtTime(volume, time);
-    }
-  }
-
-  public cancelScheduledGainValues(time: number): void {
-    this.gain.gain.cancelScheduledValues(time);
-  }
-
-  public setRateAtTime(rate: number, time: number): void {
+  private setRateAtTime(rate: number, time: number): void {
     if (rate >= 0) {
       this.source.playbackRate.setValueAtTime(rate, time);
     }
