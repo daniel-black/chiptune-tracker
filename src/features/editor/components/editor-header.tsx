@@ -1,10 +1,8 @@
 import { Volume2Icon, VolumeXIcon } from "lucide-react";
-import {
-  useChannelEnable,
-  type ChannelIndex,
-} from "../../playback/atoms/enable";
+import { useChannelEnable } from "../../playback/atoms/enable";
 import { Toggle } from "@/components/ui/toggle";
 import { ResetRangeButton } from "./reset-range-button";
+import { CHANNEL_CONFIG } from "@/audio/channel-config";
 
 export function EditorHeader() {
   return (
@@ -13,10 +11,9 @@ export function EditorHeader() {
         <th className="sticky top-0 z-10 bg-background border-b h-full">
           <ResetRangeButton />
         </th>
-        <ChannelHeader name="Channel 1" index={0} />
-        <ChannelHeader name="Channel 2" index={1} />
-        <ChannelHeader name="Channel 3" index={2} />
-        <ChannelHeader name="Noise" index={3} />
+        {CHANNEL_CONFIG.map((ch, i) => (
+          <ChannelHeader key={i} name={ch.name} index={i} />
+        ))}
       </tr>
     </thead>
   );
@@ -24,7 +21,7 @@ export function EditorHeader() {
 
 type ChannelHeaderProps = {
   name: string;
-  index: ChannelIndex;
+  index: number;
 };
 
 function ChannelHeader({ name, index }: ChannelHeaderProps) {

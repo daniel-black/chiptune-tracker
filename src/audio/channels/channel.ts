@@ -1,6 +1,5 @@
-import type { SynthesizedPulseCell, SynthesizedNoiseCell } from "../synthesis";
-
-export type SynthesizedCell = SynthesizedPulseCell | SynthesizedNoiseCell;
+import type { SynthesizedCell } from "../synthesis";
+export type { SynthesizedCell };
 
 export abstract class Channel {
   protected readonly gain: GainNode;

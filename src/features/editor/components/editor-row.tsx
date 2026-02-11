@@ -1,12 +1,11 @@
 import { EditorCell } from "./editor-cell";
 import { RowControl } from "./row-control";
 import { useRowStyle } from "../atoms/row";
+import { CHANNEL_CONFIG } from "@/audio/channel-config";
 
 type EditorRowProps = {
   rowIndex: number;
 };
-
-const columns = [0, 1, 2, 3] as const;
 
 export function EditorRow({ rowIndex }: EditorRowProps) {
   return (
@@ -14,7 +13,7 @@ export function EditorRow({ rowIndex }: EditorRowProps) {
       <td className="border-x border-b font-mono">
         <RowControl rowIndex={rowIndex} />
       </td>
-      {columns.map((columnIndex) => (
+      {CHANNEL_CONFIG.map((_, columnIndex) => (
         <EditorCell
           rowIndex={rowIndex}
           columnIndex={columnIndex}

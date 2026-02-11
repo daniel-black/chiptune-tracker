@@ -3,11 +3,7 @@ import { playheadAtom } from "@/features/playback/atoms/playhead";
 import { currentSongIdAtom, songAtomFamily } from "./song";
 import { nowIso } from "@/utils/format";
 import { type Pattern } from "@/models/song";
-import {
-  synthesizeNoiseCell,
-  synthesizePulseCell,
-  type SynthesizedRow,
-} from "@/audio/synthesis";
+import { synthesizeCell, type SynthesizedRow } from "@/audio/synthesis";
 import { createDefaultPattern } from "@/models/factory";
 
 /**
@@ -55,10 +51,5 @@ export const synthesizedPlayheadRowAtom = atom<SynthesizedRow>((get) => {
   const pattern = get(patternAtom);
   const row = pattern[playhead];
 
-  return [
-    synthesizePulseCell(row[0]),
-    synthesizePulseCell(row[1]),
-    synthesizePulseCell(row[2]),
-    synthesizeNoiseCell(row[3]),
-  ] as const;
+  return row.map(synthesizeCell);
 });

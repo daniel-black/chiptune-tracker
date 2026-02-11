@@ -1,14 +1,13 @@
 import { rows } from "@/audio/constants";
+import { CHANNEL_CONFIG, CHANNEL_COUNT } from "@/audio/channel-config";
 
-const MAX_COL = 3;
+const MAX_COL = CHANNEL_COUNT - 1;
 
 /**
  * Returns the highest field index for a given column.
- * Pulse cells (cols 0-2): 3 fields — note (0), duty (1), volume (2)
- * Noise cell  (col 3):   2 fields — rate (0), volume (1)
  */
 export function getMaxField(col: number): number {
-  return col === 3 ? 1 : 2;
+  return CHANNEL_CONFIG[col].fieldCount - 1;
 }
 
 /** Read the grid position from the currently focused input's data attributes. */

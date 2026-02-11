@@ -1,10 +1,11 @@
 import { rows } from "@/audio/constants";
+import { CHANNEL_CONFIG } from "@/audio/channel-config";
 import { nowIso } from "@/utils/format";
 import type { NoiseCell } from "./noise-cell";
 import type { PulseCell } from "./pulse-cell";
 import type { Pattern, Row, Song } from "./song";
 
-export function createDefaultPulseCell(): PulseCell {
+function createDefaultPulseCell(): PulseCell {
   return {
     kind: "pulse",
     note: "---",
@@ -13,7 +14,7 @@ export function createDefaultPulseCell(): PulseCell {
   };
 }
 
-export function createDefaultNoiseCell(): NoiseCell {
+function createDefaultNoiseCell(): NoiseCell {
   return {
     kind: "noise",
     rate: "--",
@@ -22,12 +23,14 @@ export function createDefaultNoiseCell(): NoiseCell {
 }
 
 export function createDefaultRow(): Row {
-  return [
-    createDefaultPulseCell(),
-    createDefaultPulseCell(),
-    createDefaultPulseCell(),
-    createDefaultNoiseCell(),
-  ];
+  return CHANNEL_CONFIG.map((ch) => {
+    switch (ch.kind) {
+      case "pulse":
+        return createDefaultPulseCell();
+      case "noise":
+        return createDefaultNoiseCell();
+    }
+  });
 }
 
 export function createDefaultPattern(): Pattern {

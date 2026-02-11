@@ -1,4 +1,5 @@
 import type { Store } from "jotai/vanilla/store";
+import { CHANNEL_CONFIG } from "./channel-config";
 import type { Channel } from "./channels/channel";
 import { NoiseChannel } from "./channels/noise-channel";
 import { PulseChannel } from "./channels/pulse-channel";
@@ -38,12 +39,14 @@ export class AudioEngine {
     this.masterGainNode = this.ctx.createGain();
     this.masterGainNode.connect(this.ctx.destination);
 
-    this.channels = [
-      new PulseChannel(this.ctx, this.masterGainNode),
-      new PulseChannel(this.ctx, this.masterGainNode),
-      new PulseChannel(this.ctx, this.masterGainNode),
-      new NoiseChannel(this.ctx, this.masterGainNode),
-    ];
+    this.channels = CHANNEL_CONFIG.map((ch) => {
+      switch (ch.kind) {
+        case "pulse":
+          return new PulseChannel(this.ctx, this.masterGainNode);
+        case "noise":
+          return new NoiseChannel(this.ctx, this.masterGainNode);
+      }
+    });
 
     this.sourcesStarted = false;
     this.subscriptionsStarted = false;

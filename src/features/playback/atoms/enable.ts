@@ -1,13 +1,12 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { atomFamily } from "jotai-family";
+import { CHANNEL_COUNT } from "@/audio/channel-config";
 
-export type ChannelIndex = 0 | 1 | 2 | 3;
-
-export const channelEnableBaseAtom = atom<[boolean, boolean, boolean, boolean]>(
-  [true, true, true, true],
+export const channelEnableBaseAtom = atom<boolean[]>(
+  Array.from({ length: CHANNEL_COUNT }, () => true),
 );
 
-export const channelEnableAtomFamily = atomFamily((index: ChannelIndex) =>
+export const channelEnableAtomFamily = atomFamily((index: number) =>
   atom(
     (get) => get(channelEnableBaseAtom)[index],
     (get, set, next: boolean | ((prev: boolean) => boolean)) => {
@@ -17,7 +16,7 @@ export const channelEnableAtomFamily = atomFamily((index: ChannelIndex) =>
 
       if (nextVal === prevVal) return;
 
-      const copy = prevArr.slice() as [boolean, boolean, boolean, boolean];
+      const copy = [...prevArr];
       copy[index] = nextVal;
       set(channelEnableBaseAtom, copy);
     },
@@ -26,12 +25,12 @@ export const channelEnableAtomFamily = atomFamily((index: ChannelIndex) =>
 
 export const toggleChannelEnableAtom = atom(
   null,
-  (_, set, index: ChannelIndex) => {
+  (_, set, index: number) => {
     set(channelEnableAtomFamily(index), (prev) => !prev);
   },
 );
 
-export function useChannelEnable(index: ChannelIndex) {
+export function useChannelEnable(index: number) {
   const isEnabled = useAtomValue(channelEnableAtomFamily(index));
   const toggle = useSetAtom(toggleChannelEnableAtom);
 

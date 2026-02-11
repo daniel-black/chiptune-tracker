@@ -1,4 +1,5 @@
 import { rows } from "@/audio/constants";
+import { CHANNEL_COUNT } from "@/audio/channel-config";
 
 type CellPosition = { rowIndex: number; columnIndex: number };
 
@@ -13,7 +14,7 @@ export function parseCellKey(cellKey: string): CellPosition {
   if (!Number.isInteger(row) || row < 0 || row >= rows) {
     throw new Error(`Invalid row in cell key: "${cellKey}"`);
   }
-  if (![0, 1, 2, 3].includes(col)) {
+  if (!Number.isInteger(col) || col < 0 || col >= CHANNEL_COUNT) {
     throw new Error(`Invalid col in cell key: "${cellKey}"`);
   }
   return { rowIndex: row, columnIndex: col };
