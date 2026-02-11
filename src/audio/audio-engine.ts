@@ -191,7 +191,6 @@ export class AudioEngine {
       // stop
       this.store.set(playbackStatusAtom, "stopped");
       this.store.set(playheadAtom, range.start);
-      this.stopScheduler();
       return;
     }
 
