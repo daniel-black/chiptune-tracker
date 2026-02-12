@@ -26,7 +26,7 @@ export function Stop() {
         </Button>
       </TooltipTrigger>
       <TooltipContent>
-        Stop <Kbd>Ctrl</Kbd> + <Kbd>E</Kbd>
+        Stop <Kbd>S</Kbd>
       </TooltipContent>
     </Tooltip>
   );

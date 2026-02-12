@@ -1,6 +1,10 @@
 import { atom } from "jotai";
 import { playheadAtom } from "@/features/playback/atoms/playhead";
-import { currentSongIdAtom, songAtomFamily } from "./song";
+import {
+  currentPatternIdAtom,
+  currentSongIdAtom,
+  songAtomFamily,
+} from "./song";
 import { nowIso } from "@/utils/format";
 import { type Pattern } from "@/models/song";
 import { synthesizeCell, type SynthesizedRow } from "@/audio/synthesis";
@@ -8,28 +12,48 @@ import { createDefaultPattern } from "@/models/factory";
 
 /**
  * Read/write derived atom that delegates to the persisted
- * song pattern identified by `currentSongIdAtom`.
+ * song pattern identified by `currentSongIdAtom` + `currentPatternIdAtom`.
  */
 export const patternAtom = atom(
   (get): Pattern => {
-    const id = get(currentSongIdAtom);
+    const songId = get(currentSongIdAtom);
+    const patternId = get(currentPatternIdAtom);
 
-    if (!id) {
+    if (!songId || !patternId) {
       return createDefaultPattern();
     }
 
-    return get(songAtomFamily(id)).pattern;
+    const song = get(songAtomFamily(songId));
+    const namedPattern = song.patterns[patternId];
+
+    if (!namedPattern) {
+      return createDefaultPattern();
+    }
+
+    return namedPattern.data;
   },
   (get, set, newPattern: Pattern) => {
-    const id = get(currentSongIdAtom);
-    if (!id) {
+    const songId = get(currentSongIdAtom);
+    const patternId = get(currentPatternIdAtom);
+    if (!songId || !patternId) {
       return;
     }
 
-    const prev = get(songAtomFamily(id));
-    set(songAtomFamily(id), {
+    const prev = get(songAtomFamily(songId));
+    const prevNamedPattern = prev.patterns[patternId];
+    if (!prevNamedPattern) {
+      return;
+    }
+
+    set(songAtomFamily(songId), {
       ...prev,
-      pattern: newPattern,
+      patterns: {
+        ...prev.patterns,
+        [patternId]: {
+          ...prevNamedPattern,
+          data: newPattern,
+        },
+      },
       updatedAt: nowIso(),
     });
   },

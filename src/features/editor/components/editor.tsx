@@ -9,15 +9,18 @@ import {
 import { loopAtom } from "@/features/playback/atoms/loop";
 import { autoScrollAtom } from "@/features/playback/atoms/auto-scroll";
 import { playheadAtom } from "@/features/playback/atoms/playhead";
+import { useResetPlaybackRange } from "@/features/playback/atoms/range";
 export function Editor({ children }: { children: React.ReactNode }) {
   const togglePlayback = useSetAtom(togglePlaybackAtom);
   const stopPlayback = useSetAtom(stopPlaybackAtom);
   const [loop, setLoop] = useAtom(loopAtom);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const range = useResetPlaybackRange();
 
-  useHotkeys("ctrl+Space", () => togglePlayback());
-  useHotkeys("ctrl+e", () => stopPlayback());
-  useHotkeys("ctrl+l", () => setLoop(!loop));
+  useHotkeys("Space", () => togglePlayback());
+  useHotkeys("s", () => stopPlayback());
+  useHotkeys("l", () => setLoop(!loop));
+  useHotkeys("r", range.reset);
 
   return (
     <div ref={scrollRef} className="h-dvh min-w-fit w-fit overflow-auto">

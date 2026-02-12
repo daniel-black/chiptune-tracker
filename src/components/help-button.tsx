@@ -46,21 +46,19 @@ function EditorHelpContent() {
           <ul className="space-y-2">
             <li className="flex items-center justify-between">
               <span>Toggle playback</span>
-              <span>
-                <Kbd>Ctrl</Kbd> + <Kbd>Space</Kbd>
-              </span>
+              <Kbd>Space</Kbd>
             </li>
             <li className="flex items-center justify-between">
               <span>Stop playback</span>
-              <span>
-                <Kbd>Ctrl</Kbd> + <Kbd>E</Kbd>
-              </span>
+              <Kbd>S</Kbd>
             </li>
             <li className="flex items-center justify-between">
               <span>Toggle loop</span>
-              <span>
-                <Kbd>Ctrl</Kbd> + <Kbd>L</Kbd>
-              </span>
+              <Kbd>L</Kbd>
+            </li>
+            <li className="flex items-center justify-between">
+              <span>Reset playback range</span>
+              <Kbd>R</Kbd>
             </li>
           </ul>
 
@@ -113,7 +111,7 @@ export function HelpButton() {
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
 
-  useHotkeys("ctrl+q", () => setOpen((prev) => !prev), {
+  useHotkeys("h", () => setOpen((prev) => !prev), {
     preventDefault: true,
   });
 
@@ -135,7 +133,7 @@ export function HelpButton() {
           </DialogTrigger>
         </TooltipTrigger>
         <TooltipContent side="right">
-          Help <Kbd>Ctrl</Kbd> + <Kbd>Q</Kbd>
+          Help <Kbd>H</Kbd>
         </TooltipContent>
       </Tooltip>
       <DialogContent>

@@ -30,7 +30,7 @@ export function RowControl({ rowIndex }: { rowIndex: number }) {
           variant="outline"
           className="border-none w-10 focus-visible:ring-0 hover:cursor-context-menu"
         >
-          {padNumberTwoDigit(rowIndex + 1)}
+          {padNumberTwoDigit(rowIndex)}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>

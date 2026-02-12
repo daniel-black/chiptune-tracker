@@ -8,6 +8,8 @@ import { EditorRow } from "@/features/editor/components/editor-row";
 import { InputExplanation } from "@/features/panel/components/input-explanation";
 import { Panel } from "@/features/panel/components/panel";
 import { PanelControls } from "@/features/panel/components/panel-controls";
+import { PatternSequence } from "@/features/panel/components/pattern-sequence";
+import { PatternLibrary } from "@/features/panel/components/pattern-library";
 import { SongNameForm } from "@/features/panel/components/song-name-form";
 import { useEffect } from "react";
 import { Navigate, useParams } from "react-router";
@@ -60,6 +62,14 @@ export function EditorPage() {
       <Panel>
         <PanelControls />
         <SongNameForm />
+        <div className="flex">
+          <div className="flex-1">
+            <PatternLibrary />
+          </div>
+          <div className="flex-1">
+            <PatternSequence />
+          </div>
+        </div>
         <InputExplanation />
       </Panel>
     </div>

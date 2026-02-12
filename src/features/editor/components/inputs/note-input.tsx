@@ -27,6 +27,11 @@ type NoteInputProps = {
 
 export function NoteInput({ note, setNote }: NoteInputProps) {
   const [localNote, setLocalNote] = useState<string>(note);
+  const [prevNote, setPrevNote] = useState(note);
+  if (prevNote !== note) {
+    setPrevNote(note);
+    setLocalNote(note);
+  }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (localNote.length === 3 && isValidPitch(e.key)) {
@@ -85,7 +90,7 @@ export function NoteInput({ note, setNote }: NoteInputProps) {
         (secondChar === "#" && canBeSharp(pitch)) ||
         (secondChar === "b" && canBeFlat(pitch))
       ) {
-        setLocalNote(value);
+        setLocalNote(`${pitch}${secondChar}`);
         return;
       }
     }

@@ -5,10 +5,17 @@ export type Cell = PulseCell | NoiseCell;
 export type Row = Array<Cell>;
 export type Pattern = Array<Row>;
 
+export type NamedPattern = {
+  id: string;
+  name: string;
+  data: Pattern;
+};
+
 export type Song = {
   name: string;
   id: string;
   createdAt: string;
   updatedAt: string;
-  pattern: Pattern;
+  patterns: Record<string, NamedPattern>;
+  patternOrder: Array<string>;
 };

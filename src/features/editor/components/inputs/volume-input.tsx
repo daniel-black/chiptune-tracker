@@ -15,6 +15,11 @@ export function VolumeInput({ volume, setVolume, field }: VolumeInputProps) {
   const [localVolume, setLocalVolume] = useState<string>(
     volume !== "--" ? padNumberTwoDigit(volume) : volume,
   );
+  const [prevVolume, setPrevVolume] = useState(volume);
+  if (prevVolume !== volume) {
+    setPrevVolume(volume);
+    setLocalVolume(volume !== "--" ? padNumberTwoDigit(volume) : volume);
+  }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     // shortcut for entering a continue symbol
@@ -41,6 +46,12 @@ export function VolumeInput({ volume, setVolume, field }: VolumeInputProps) {
   // come back and validate the shit out of this later
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.value.trim();
+
+    if (value === "") {
+      setLocalVolume("");
+      return;
+    }
+
     const valueNum = Number(value);
 
     if (isVolumeLevel(valueNum)) {

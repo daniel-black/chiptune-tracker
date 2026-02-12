@@ -8,7 +8,45 @@ import { resetPlaybackRangeAtom } from "@/features/playback/atoms/range";
 import { stopPlaybackAtom } from "@/features/playback/atoms/playback";
 import { playheadAtom } from "@/features/playback/atoms/playhead";
 
-const songStorage = createJSONStorage<Song>(() => localStorage);
+const baseSongStorage = createJSONStorage<Song>(() => localStorage);
+
+/** Migrate legacy songs that have `pattern` instead of `patterns`. */
+function migrateLegacySong(key: string): void {
+  const raw = localStorage.getItem(key);
+  if (!raw) return;
+  try {
+    const parsed = JSON.parse(raw);
+    if ("pattern" in parsed && !("patterns" in parsed)) {
+      const patternId = crypto.randomUUID();
+      const migrated = {
+        name: parsed.name,
+        id: parsed.id,
+        createdAt: parsed.createdAt,
+        updatedAt: parsed.updatedAt,
+        patterns: {
+          [patternId]: {
+            id: patternId,
+            name: "Pattern 1",
+            data: parsed.pattern,
+          },
+        },
+        patternOrder: [patternId],
+      };
+      localStorage.setItem(key, JSON.stringify(migrated));
+    }
+  } catch {
+    // If parsing fails, let the base storage handle it
+  }
+}
+
+const songStorage: typeof baseSongStorage = {
+  ...baseSongStorage,
+  getItem(key, initialValue) {
+    migrateLegacySong(key);
+    return baseSongStorage.getItem(key, initialValue);
+  },
+};
+
 const indexStorage = createJSONStorage<string[]>(() => localStorage);
 
 /** Memoized atom family — same uuid always returns the same atom instance. */
@@ -28,6 +66,9 @@ export const songIndexAtom = atomWithStorage<string[]>(
 /** UUID of the song currently open in the editor. Null if not on editor page */
 export const currentSongIdAtom = atom<string | null>(null);
 
+/** ID of the pattern currently displayed in the editor */
+export const currentPatternIdAtom = atom<string | null>(null);
+
 export const setCurrentSongIdAtom = atom(
   null,
   (get, set, uuid: string | null) => {
@@ -36,6 +77,13 @@ export const setCurrentSongIdAtom = atom(
       set(stopPlaybackAtom);
       set(resetPlaybackRangeAtom);
       set(playheadAtom, 0);
+
+      if (uuid) {
+        const song = get(songAtomFamily(uuid));
+        set(currentPatternIdAtom, song.patternOrder[0] ?? null);
+      } else {
+        set(currentPatternIdAtom, null);
+      }
     }
   },
 );
@@ -46,6 +94,10 @@ export function useSetCurrentSongIdAtom() {
 
 export function useCurrentSongId() {
   return useAtomValue(currentSongIdAtom);
+}
+
+export function useCurrentPatternId() {
+  return useAtomValue(currentPatternIdAtom);
 }
 
 /** Atom for creating a new, persisted song and adding it to the index */

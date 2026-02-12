@@ -3,7 +3,6 @@ import { isDuty } from "@/audio/characteristics/duty";
 import { TextInput } from "./text-input";
 import type { PulseCell } from "@/models/pulse-cell";
 
-
 function isValidFirstLetterForDuty(value: string) {
   return /^[1257-]$/.test(value);
 }
@@ -23,6 +22,11 @@ type DutyInputProps = {
 
 export function DutyInput({ duty, setDuty }: DutyInputProps) {
   const [localDuty, setLocalDuty] = useState<string>(duty);
+  const [prevDuty, setPrevDuty] = useState(duty);
+  if (prevDuty !== duty) {
+    setPrevDuty(duty);
+    setLocalDuty(duty);
+  }
 
   // Key down can handle the setting logic for Duty input since values are few and distinct
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -45,8 +49,8 @@ export function DutyInput({ duty, setDuty }: DutyInputProps) {
 
   // Since we can easily shortcut to the right value in keyDown, we don't need onChange to do work
   // Keeping onChange around though so that I don't get console errors about an uncontrolled component etc.
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    console.log(`Duty input ignored value: ${e.target.value}`);
+  function handleChange(_: React.ChangeEvent<HTMLInputElement>) {
+    // does nothing
   }
 
   function handleBlur() {

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Kbd } from "@/components/ui/kbd";
 import {
   Tooltip,
   TooltipContent,
@@ -23,7 +24,10 @@ export function ResetRangeButton() {
           <ListChevronsUpDownIcon />
         </Button>
       </TooltipTrigger>
-      <TooltipContent side="right">Reset the playback range</TooltipContent>
+      <TooltipContent side="right" className="flex items-center gap-2">
+        <span>Reset the playback range</span>
+        <Kbd>R</Kbd>
+      </TooltipContent>
     </Tooltip>
   );
 }

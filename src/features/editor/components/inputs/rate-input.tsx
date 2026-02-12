@@ -11,6 +11,11 @@ type RateInputProps = {
 
 export function RateInput({ rate, setRate }: RateInputProps) {
   const [localRate, setLocalRate] = useState<string>(rate);
+  const [prevRate, setPrevRate] = useState(rate);
+  if (prevRate !== rate) {
+    setPrevRate(rate);
+    setLocalRate(rate);
+  }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "-") {

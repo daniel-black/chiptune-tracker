@@ -27,7 +27,7 @@ export function Loop() {
         </div>
       </TooltipTrigger>
       <TooltipContent>
-        Toggle loop <Kbd>Ctrl</Kbd> + <Kbd>L</Kbd>
+        Toggle loop <Kbd>L</Kbd>
       </TooltipContent>
     </Tooltip>
   );
