@@ -89,6 +89,18 @@ function EditorHelpContent() {
             <li className="flex items-center justify-between">
               <span>Note fields auto-advance to the next row</span>
             </li>
+            <li className="flex items-center justify-between">
+              <span>Undo</span>
+              <span>
+                <Kbd>Ctrl</Kbd> + <Kbd>Z</Kbd>
+              </span>
+            </li>
+            <li className="flex items-center justify-between">
+              <span>Redo</span>
+              <span>
+                <Kbd>Ctrl</Kbd> + <Kbd>Shift</Kbd> + <Kbd>Z</Kbd>
+              </span>
+            </li>
           </ul>
         </div>
       </DialogDescription>

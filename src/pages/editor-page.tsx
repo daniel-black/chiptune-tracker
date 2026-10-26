@@ -4,6 +4,7 @@ import {
   useCurrentSongId,
   useSetCurrentSongIdAtom,
 } from "@/atoms/song";
+import { useResetSongHistory } from "@/atoms/song-history";
 import { initAudioOnce, stopSubscriptions } from "@/bootstrap";
 import { Editor } from "@/features/editor/components/editor";
 import { EditorBody } from "@/features/editor/components/editor-body";
@@ -32,17 +33,20 @@ export function EditorPage() {
 
   const currentSongId = useCurrentSongId();
   const setCurrentSongId = useSetCurrentSongIdAtom();
+  const resetSongHistory = useResetSongHistory();
 
   // Point the editor's songAtom at the persisted song for this route.
   useEffect(() => {
     if (songId && songExists) {
       setCurrentSongId(songId);
+      // Undo must never cross songs
+      resetSongHistory();
     }
 
     return () => {
       setCurrentSongId(null);
     };
-  }, [songId, songExists, setCurrentSongId]);
+  }, [songId, songExists, setCurrentSongId, resetSongHistory]);
 
   useEffect(() => {
     initAudioOnce();

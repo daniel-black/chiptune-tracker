@@ -5,6 +5,7 @@ import { MasterVolume } from "@/features/playback/components/master-volume";
 import { Pause } from "@/features/playback/components/pause";
 import { Start } from "@/features/playback/components/start";
 import { Stop } from "@/features/playback/components/stop";
+import { UndoRedo } from "./undo-redo";
 
 export function PanelControls() {
   return (
@@ -16,6 +17,8 @@ export function PanelControls() {
       </ButtonGroup>
 
       <Loop />
+
+      <UndoRedo />
 
       <div className="flex-1">
         <MasterVolume />
