@@ -11,6 +11,12 @@ import { playbackRangeAtom } from "@/features/playback/atoms/range";
 import { channelEnableBaseAtom } from "@/features/playback/atoms/enable";
 import { playbackStatusAtom } from "@/features/playback/atoms/playback";
 import { normalizedMasterVolumeAtom } from "@/features/playback/atoms/master-volume";
+import { sequencePositionAtom } from "@/features/playback/atoms/sequence-position";
+import {
+  currentSongIdAtom,
+  currentPatternIdAtom,
+  songAtomFamily,
+} from "@/atoms/song";
 
 export class AudioEngine {
   private readonly ctx: AudioContext;
@@ -110,6 +116,15 @@ export class AudioEngine {
       return;
     }
 
+    // Compute initial sequence position from the current pattern
+    const songId = this.store.get(currentSongIdAtom);
+    const patternId = this.store.get(currentPatternIdAtom);
+    if (songId && patternId) {
+      const song = this.store.get(songAtomFamily(songId));
+      const pos = song.patternOrder.indexOf(patternId);
+      this.store.set(sequencePositionAtom, pos !== -1 ? pos : 0);
+    }
+
     if (!this.sourcesStarted) {
       this.startAllSources();
     }
@@ -171,14 +186,29 @@ export class AudioEngine {
     const playhead = this.store.get(playheadAtom);
 
     if (playhead + 1 > range.end) {
-      if (loop) {
-        this.store.set(playheadAtom, range.start);
-        return;
-      }
+      // End of current pattern's range — try to advance in sequence
+      const songId = this.store.get(currentSongIdAtom);
+      if (!songId) return;
 
-      // stop
-      this.store.set(playbackStatusAtom, "stopped");
-      this.store.set(playheadAtom, range.start);
+      const song = this.store.get(songAtomFamily(songId));
+      const seqPos = this.store.get(sequencePositionAtom);
+      const nextPos = seqPos + 1;
+
+      if (nextPos < song.patternOrder.length) {
+        // Advance to next pattern in sequence
+        this.store.set(sequencePositionAtom, nextPos);
+        this.store.set(currentPatternIdAtom, song.patternOrder[nextPos]);
+        this.store.set(playheadAtom, range.start);
+      } else if (loop) {
+        // Wrap to first pattern in sequence
+        this.store.set(sequencePositionAtom, 0);
+        this.store.set(currentPatternIdAtom, song.patternOrder[0]);
+        this.store.set(playheadAtom, range.start);
+      } else {
+        // Stop playback
+        this.store.set(playbackStatusAtom, "stopped");
+        this.store.set(playheadAtom, range.start);
+      }
       return;
     }
 

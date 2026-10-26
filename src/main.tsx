@@ -6,6 +6,9 @@ import { EditorPage } from "@/pages/editor-page.tsx";
 import { AppWrapper } from "@/components/app-wrapper.tsx";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { NotFoundPage } from "./pages/not-found-page";
+import { seedDefaultSong } from "./seed-default-song";
+
+seedDefaultSong();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

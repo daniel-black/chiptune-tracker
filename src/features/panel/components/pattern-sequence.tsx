@@ -43,6 +43,9 @@ import {
   ArrowDownIcon,
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useSequencePosition } from "@/features/playback/atoms/sequence-position";
+import { playbackStatusAtom } from "@/features/playback/atoms/playback";
+import { useAtomValue } from "jotai";
 
 export function PatternSequence() {
   const patterns = usePatternList();
@@ -76,6 +79,10 @@ export function PatternSequence() {
   }
 
   const canDelete = sequence.length > 1;
+
+  const sequencePosition = useSequencePosition();
+  const playbackStatus = useAtomValue(playbackStatusAtom);
+  const isPlaying = playbackStatus !== "stopped";
 
   return (
     <div className="p-4 space-y-2">
@@ -120,6 +127,7 @@ export function PatternSequence() {
                   isFirst={entry.index === 0}
                   isLast={entry.index === sequence.length - 1}
                   canDelete={canDelete}
+                  isActive={isPlaying && entry.index === sequencePosition}
                 />
               ))}
             </ol>
@@ -135,6 +143,7 @@ type SortableSequenceRowProps = {
   isFirst: boolean;
   isLast: boolean;
   canDelete: boolean;
+  isActive: boolean;
 };
 
 function SortableSequenceRow({
@@ -142,6 +151,7 @@ function SortableSequenceRow({
   isFirst,
   isLast,
   canDelete,
+  isActive,
 }: SortableSequenceRowProps) {
   const removeFromSequence = useRemoveFromSequence();
   const duplicateInSequence = useDuplicateInSequence();
@@ -165,9 +175,9 @@ function SortableSequenceRow({
     <li
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-1 rounded-md px-2 py-1 bg-background ${
-        isDragging ? "opacity-50" : ""
-      }`}
+      className={`flex items-center gap-1 rounded-md px-2 py-1 ${
+        isActive ? "bg-accent" : "bg-background"
+      } ${isDragging ? "opacity-50" : ""}`}
     >
       <button
         className="cursor-grab touch-none text-muted-foreground hover:text-foreground"
