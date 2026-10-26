@@ -61,6 +61,7 @@ export const songIndexAtom = atomWithStorage<string[]>(
   "songIndex",
   [],
   indexStorage,
+  { getOnInit: true },
 );
 
 /** UUID of the song currently open in the editor. Null if not on editor page */
@@ -85,6 +86,24 @@ export const setCurrentSongIdAtom = atom(
         set(currentPatternIdAtom, null);
       }
     }
+  },
+);
+
+/**
+ * Apply a change to the current song and bump updatedAt. The updater returns the
+ * fields to merge, or null to leave the song untouched.
+ */
+export const updateCurrentSongAtom = atom(
+  null,
+  (get, set, updater: (song: Song) => Partial<Song> | null) => {
+    const songId = get(currentSongIdAtom);
+    if (!songId) return;
+
+    const song = get(songAtomFamily(songId));
+    const changes = updater(song);
+    if (!changes) return;
+
+    set(songAtomFamily(songId), { ...song, ...changes, updatedAt: nowIso() });
   },
 );
 
@@ -138,18 +157,8 @@ const songNameAtom = atom(
 
     return get(songAtomFamily(id)).name;
   },
-  (get, set, name: string) => {
-    const id = get(currentSongIdAtom);
-    if (!id) {
-      return;
-    }
-
-    const prev = get(songAtomFamily(id));
-    set(songAtomFamily(id), {
-      ...prev,
-      name,
-      updatedAt: nowIso(),
-    });
+  (_get, set, name: string) => {
+    set(updateCurrentSongAtom, () => ({ name }));
   },
 );
 

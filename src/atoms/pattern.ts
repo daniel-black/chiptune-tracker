@@ -4,8 +4,8 @@ import {
   currentPatternIdAtom,
   currentSongIdAtom,
   songAtomFamily,
+  updateCurrentSongAtom,
 } from "./song";
-import { nowIso } from "@/utils/format";
 import { type Pattern } from "@/models/song";
 import { synthesizeCell, type SynthesizedRow } from "@/audio/synthesis";
 import { createDefaultPattern } from "@/models/factory";
@@ -33,28 +33,23 @@ export const patternAtom = atom(
     return namedPattern.data;
   },
   (get, set, newPattern: Pattern) => {
-    const songId = get(currentSongIdAtom);
     const patternId = get(currentPatternIdAtom);
-    if (!songId || !patternId) {
+    if (!patternId) {
       return;
     }
 
-    const prev = get(songAtomFamily(songId));
-    const prevNamedPattern = prev.patterns[patternId];
-    if (!prevNamedPattern) {
-      return;
-    }
+    set(updateCurrentSongAtom, (song) => {
+      const prevNamedPattern = song.patterns[patternId];
+      if (!prevNamedPattern) {
+        return null;
+      }
 
-    set(songAtomFamily(songId), {
-      ...prev,
-      patterns: {
-        ...prev.patterns,
-        [patternId]: {
-          ...prevNamedPattern,
-          data: newPattern,
+      return {
+        patterns: {
+          ...song.patterns,
+          [patternId]: { ...prevNamedPattern, data: newPattern },
         },
-      },
-      updatedAt: nowIso(),
+      };
     });
   },
 );

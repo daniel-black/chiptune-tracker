@@ -9,7 +9,10 @@ import { bpmAtom } from "@/features/playback/atoms/bpm";
 import { playheadAtom } from "@/features/playback/atoms/playhead";
 import { playbackRangeAtom } from "@/features/playback/atoms/range";
 import { channelEnableBaseAtom } from "@/features/playback/atoms/enable";
-import { playbackStatusAtom } from "@/features/playback/atoms/playback";
+import {
+  playbackStatusAtom,
+  type PlaybackStatus,
+} from "@/features/playback/atoms/playback";
 import { normalizedMasterVolumeAtom } from "@/features/playback/atoms/master-volume";
 import { sequencePositionAtom } from "@/features/playback/atoms/sequence-position";
 import {
@@ -29,6 +32,7 @@ export class AudioEngine {
   private readonly lookAheadTime = 0.1; // 100ms
   private nextTickTime = 0;
   private scheduleIntervalId: number | null = null;
+  private lastStatus: PlaybackStatus = "stopped";
 
   private sourcesStarted: boolean;
   private subscriptionsStarted: boolean;
@@ -67,10 +71,12 @@ export class AudioEngine {
     this.unsubscribers.push(
       this.store.sub(playbackStatusAtom, () => {
         const status = this.store.get(playbackStatusAtom);
+        const prevStatus = this.lastStatus;
+        this.lastStatus = status;
 
         switch (status) {
           case "playing":
-            this.onPlay();
+            this.onPlay(prevStatus === "paused");
             return;
           case "paused":
             this.onPause();
@@ -82,17 +88,20 @@ export class AudioEngine {
       }),
     );
 
+    // store.sub only fires on change, so apply the initial volume up front
+    this.applyMasterVolume();
     this.unsubscribers.push(
-      this.store.sub(normalizedMasterVolumeAtom, () => {
-        const volume = this.store.get(normalizedMasterVolumeAtom);
-        const clampedGain = Math.max(0, Math.min(volume, 1));
-
-        this.masterGainNode.gain.setValueAtTime(
-          clampedGain,
-          this.ctx.currentTime,
-        );
-      }),
+      this.store.sub(normalizedMasterVolumeAtom, () =>
+        this.applyMasterVolume(),
+      ),
     );
+  }
+
+  private applyMasterVolume(): void {
+    const volume = this.store.get(normalizedMasterVolumeAtom);
+    const clampedGain = Math.max(0, Math.min(volume, 1));
+
+    this.masterGainNode.gain.setValueAtTime(clampedGain, this.ctx.currentTime);
   }
 
   private startAllSources(): void {
@@ -108,7 +117,7 @@ export class AudioEngine {
     return 60 / (this.getBpm() * this.rowsPerBeat);
   }
 
-  private async onPlay() {
+  private async onPlay(resuming: boolean) {
     if (this.scheduleIntervalId !== null) {
       console.error(
         `scheduleIntervalId already exists! ${this.scheduleIntervalId}`,
@@ -116,10 +125,11 @@ export class AudioEngine {
       return;
     }
 
-    // Compute initial sequence position from the current pattern
+    // Compute initial sequence position from the current pattern. When resuming
+    // from pause, keep the existing position (the pattern may appear more than once).
     const songId = this.store.get(currentSongIdAtom);
     const patternId = this.store.get(currentPatternIdAtom);
-    if (songId && patternId) {
+    if (!resuming && songId && patternId) {
       const song = this.store.get(songAtomFamily(songId));
       const pos = song.patternOrder.indexOf(patternId);
       this.store.set(sequencePositionAtom, pos !== -1 ? pos : 0);
@@ -133,7 +143,20 @@ export class AudioEngine {
       await this.ctx.resume();
     }
 
-    this.nextTickTime = this.ctx.currentTime;
+    // The context clock is frozen while suspended, so on resume the rows already
+    // scheduled ahead of the pause are still valid; continue right after them.
+    if (!resuming) {
+      this.nextTickTime = this.ctx.currentTime;
+    }
+
+    // Playback may have been paused/stopped, or another onPlay may have started
+    // the scheduler, while awaiting resume()
+    if (
+      this.store.get(playbackStatusAtom) !== "playing" ||
+      this.scheduleIntervalId !== null
+    ) {
+      return;
+    }
 
     // Start the scheduler
     this.scheduleIntervalId = window.setInterval(
@@ -151,7 +174,10 @@ export class AudioEngine {
     }
 
     // Schedule notes until we're a bit ahead of current time
-    while (this.nextTickTime < this.ctx.currentTime + this.lookAheadTime) {
+    while (
+      this.store.get(playbackStatusAtom) === "playing" &&
+      this.nextTickTime < this.ctx.currentTime + this.lookAheadTime
+    ) {
       // Schedule the current row
       this.scheduleRow(this.nextTickTime);
 

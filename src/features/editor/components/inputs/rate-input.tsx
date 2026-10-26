@@ -4,6 +4,10 @@ import { TextInput } from "./text-input";
 import { padNumberTwoDigit } from "@/utils/format";
 import type { NoiseCell } from "@/models/noise-cell";
 
+function isRateDigits(value: string) {
+  return /^\d{1,2}$/.test(value);
+}
+
 type RateInputProps = {
   rate: NoiseCell["rate"];
   setRate: (rate: NoiseCell["rate"]) => void;
@@ -38,41 +42,28 @@ export function RateInput({ rate, setRate }: RateInputProps) {
       return;
     }
 
-    const rateNum = Number(value);
-
-    if (isNaN(rateNum) || rateNum < 0 || rateNum > 99) {
+    // Only whole numbers 0-99 ("1", "05", "99"); rejects "." / "-" / "e" etc.
+    if (!isRateDigits(value)) {
       return;
     }
 
-    const paddedRate = padNumberTwoDigit(rateNum);
-    setRate(paddedRate as Rate);
+    const paddedRate = padNumberTwoDigit(Number(value)) as Rate;
+    if (paddedRate !== rate) {
+      setRate(paddedRate);
+    }
     setLocalRate(value);
   }
 
   function handleBlur() {
-    const rateNum = Number(localRate);
+    // An emptied or otherwise invalid input means "no rate", not "00"
+    const nextRate: NoiseCell["rate"] = isRateDigits(localRate)
+      ? (padNumberTwoDigit(Number(localRate)) as Rate)
+      : "--";
 
-    if (isNaN(rateNum)) {
-      if (rate !== "--") {
-        setRate("--");
-      }
-      setLocalRate("--");
-      return;
+    if (nextRate !== rate) {
+      setRate(nextRate);
     }
-
-    // If rate num is out of range
-    if (rateNum < 0 || rateNum > 99) {
-      if (rate !== "--") {
-        setRate("--");
-      }
-      setLocalRate("--");
-      return;
-    }
-
-    // rate is in range
-    const paddedRate = padNumberTwoDigit(rateNum);
-    setRate(paddedRate as Rate);
-    setLocalRate(paddedRate);
+    setLocalRate(nextRate);
   }
 
   return (

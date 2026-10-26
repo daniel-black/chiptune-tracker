@@ -1,33 +1,12 @@
-// Acceptable volume levels are 0 (silent) to 15 (full volume)
-// Since there are only a handful of discrete volume increments, I precomputed them
-// and made them available in a fast lookup like this. Probably doesn't matter at this
-// scale whether or not I did the math on the fly
-const volumeEntries = [
-  [0, 0],
-  [1, 0.066],
-  [2, 0.133],
-  [3, 0.2],
-  [4, 0.266],
-  [5, 0.333],
-  [6, 0.4],
-  [7, 0.466],
-  [8, 0.533],
-  [9, 0.6],
-  [10, 0.666],
-  [11, 0.733],
-  [12, 0.8],
-  [13, 0.866],
-  [14, 0.933],
-  [15, 1],
-] as const;
+// Acceptable volume levels are 0 (silent) to 15 (full volume), mapped linearly to gain 0-1
+export type VolumeLevel =
+  0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
 
-export type VolumeLevel = (typeof volumeEntries)[number][0];
+const maxVolumeLevel = 15;
 
 export function isVolumeLevel(num: number): num is VolumeLevel {
-  return num >= 0 && num <= 15 && Number.isInteger(num);
+  return num >= 0 && num <= maxVolumeLevel && Number.isInteger(num);
 }
-
-const volumeMap = new Map<VolumeLevel, number>(volumeEntries);
 
 export function getVolume(volumeString: string): number {
   if (volumeString === "--") {
@@ -48,13 +27,5 @@ export function getVolume(volumeString: string): number {
     );
   }
 
-  const volume = volumeMap.get(parsedVolumeLevel);
-
-  if (volume === undefined) {
-    throw new Error(
-      `Unable to get volume from volume level (${parsedVolumeLevel})`,
-    );
-  }
-
-  return volume;
+  return parsedVolumeLevel / maxVolumeLevel;
 }

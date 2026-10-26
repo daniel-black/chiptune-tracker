@@ -3,10 +3,11 @@ import {
   currentPatternIdAtom,
   currentSongIdAtom,
   songAtomFamily,
+  updateCurrentSongAtom,
 } from "./song";
 import { type NamedPattern } from "@/models/song";
 import { createNamedPattern } from "@/models/factory";
-import { nowIso } from "@/utils/format";
+import { sequencePositionAtom } from "@/features/playback/atoms/sequence-position";
 import { stopPlaybackAtom } from "@/features/playback/atoms/playback";
 import { resetPlaybackRangeAtom } from "@/features/playback/atoms/range";
 import { playheadAtom } from "@/features/playback/atoms/playhead";
@@ -42,19 +43,15 @@ export const switchPatternAtom = atom(null, (get, set, patternId: string) => {
 
 /** Create a new empty pattern and switch to it. */
 export const createPatternAtom = atom(null, (get, set) => {
-  const songId = get(currentSongIdAtom);
-  if (!songId) return;
+  if (!get(currentSongIdAtom)) return;
 
-  const song = get(songAtomFamily(songId));
   const patternId = crypto.randomUUID();
   const pattern = createNamedPattern(patternId, "Untitled Pattern");
 
-  set(songAtomFamily(songId), {
-    ...song,
+  set(updateCurrentSongAtom, (song) => ({
     patterns: { ...song.patterns, [patternId]: pattern },
     patternOrder: [...song.patternOrder, patternId],
-    updatedAt: nowIso(),
-  });
+  }));
 
   set(switchPatternAtom, patternId);
 });
@@ -79,12 +76,10 @@ export const duplicatePatternAtom = atom(null, (get, set, sourceId: string) => {
   const newOrder = [...song.patternOrder];
   newOrder.splice(sourceIndex + 1, 0, patternId);
 
-  set(songAtomFamily(songId), {
-    ...song,
+  set(updateCurrentSongAtom, () => ({
     patterns: { ...song.patterns, [patternId]: duplicate },
     patternOrder: newOrder,
-    updatedAt: nowIso(),
-  });
+  }));
 
   set(switchPatternAtom, patternId);
 });
@@ -92,44 +87,49 @@ export const duplicatePatternAtom = atom(null, (get, set, sourceId: string) => {
 /** Rename a pattern by ID. */
 export const renamePatternAtom = atom(
   null,
-  (get, set, { patternId, name }: { patternId: string; name: string }) => {
-    const songId = get(currentSongIdAtom);
-    if (!songId) return;
+  (_get, set, { patternId, name }: { patternId: string; name: string }) => {
+    set(updateCurrentSongAtom, (song) => {
+      const pattern = song.patterns[patternId];
+      if (!pattern) return null;
 
-    const song = get(songAtomFamily(songId));
-    const pattern = song.patterns[patternId];
-    if (!pattern) return;
-
-    set(songAtomFamily(songId), {
-      ...song,
-      patterns: {
-        ...song.patterns,
-        [patternId]: { ...pattern, name },
-      },
-      updatedAt: nowIso(),
+      return {
+        patterns: { ...song.patterns, [patternId]: { ...pattern, name } },
+      };
     });
   },
 );
 
-/** Delete a pattern. Prevents deleting the last pattern. */
+/** Delete a pattern and its sequence entries. Prevents deleting the last pattern. */
 export const deletePatternAtom = atom(null, (get, set, patternId: string) => {
   const songId = get(currentSongIdAtom);
   if (!songId) return;
 
   const song = get(songAtomFamily(songId));
-  if (song.patternOrder.length <= 1) return;
+  if (!song.patterns[patternId]) return;
 
-  const newOrder = song.patternOrder.filter((id) => id !== patternId);
   const remainingPatterns = Object.fromEntries(
     Object.entries(song.patterns).filter(([id]) => id !== patternId),
   );
+  const remainingIds = Object.keys(remainingPatterns);
+  if (remainingIds.length === 0) return;
 
-  set(songAtomFamily(songId), {
-    ...song,
+  let newOrder = song.patternOrder.filter((id) => id !== patternId);
+  // patternOrder must never be empty
+  if (newOrder.length === 0) newOrder = [remainingIds[0]];
+
+  set(updateCurrentSongAtom, () => ({
     patterns: remainingPatterns,
     patternOrder: newOrder,
-    updatedAt: nowIso(),
-  });
+  }));
+
+  // Keep the sequence position on the same entry
+  const pos = get(sequencePositionAtom);
+  const removedBefore = song.patternOrder
+    .slice(0, pos)
+    .filter((id) => id === patternId).length;
+  if (removedBefore > 0) {
+    set(sequencePositionAtom, pos - removedBefore);
+  }
 
   // If we deleted the current pattern, switch to first
   if (get(currentPatternIdAtom) === patternId) {

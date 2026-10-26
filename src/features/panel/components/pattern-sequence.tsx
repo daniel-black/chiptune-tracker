@@ -10,7 +10,6 @@ import {
 import {
   SortableContext,
   useSortable,
-  arrayMove,
   verticalListSortingStrategy,
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
@@ -22,7 +21,7 @@ import {
   useRemoveFromSequence,
   useDuplicateInSequence,
   useSwapInSequence,
-  useReorderSequence,
+  useMoveInSequence,
   type SequenceEntry,
 } from "@/atoms/sequence";
 import { Button } from "@/components/ui/button";
@@ -51,7 +50,7 @@ export function PatternSequence() {
   const patterns = usePatternList();
   const sequence = useSequenceList();
   const addToSequence = useAddToSequence();
-  const reorderSequence = useReorderSequence();
+  const moveInSequence = useMoveInSequence();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -68,14 +67,7 @@ export function PatternSequence() {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
-    const oldIndex = Number(active.id);
-    const newIndex = Number(over.id);
-    const newOrder = arrayMove(
-      sequence.map((e) => e.patternId),
-      oldIndex,
-      newIndex,
-    );
-    reorderSequence(newOrder);
+    moveInSequence({ from: Number(active.id), to: Number(over.id) });
   }
 
   const canDelete = sequence.length > 1;

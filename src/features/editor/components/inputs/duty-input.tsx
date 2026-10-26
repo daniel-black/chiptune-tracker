@@ -55,7 +55,10 @@ export function DutyInput({ duty, setDuty }: DutyInputProps) {
 
   function handleBlur() {
     if (!isDuty(localDuty)) {
-      setDuty("--");
+      // Only write when the stored value actually changes (e.g. arrowing through "--" cells)
+      if (duty !== "--") {
+        setDuty("--");
+      }
       setLocalDuty("--");
     }
   }

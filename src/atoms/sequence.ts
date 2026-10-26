@@ -1,6 +1,10 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
-import { currentSongIdAtom, songAtomFamily } from "./song";
-import { nowIso } from "@/utils/format";
+import {
+  currentSongIdAtom,
+  songAtomFamily,
+  updateCurrentSongAtom,
+} from "./song";
+import { sequencePositionAtom } from "@/features/playback/atoms/sequence-position";
 
 export type SequenceEntry = {
   index: number;
@@ -22,97 +26,94 @@ export const sequenceListAtom = atom((get): SequenceEntry[] => {
 });
 
 /** Append a pattern ID to the end of the sequence. */
-export const addToSequenceAtom = atom(null, (get, set, patternId: string) => {
-  const songId = get(currentSongIdAtom);
-  if (!songId) return;
-
-  const song = get(songAtomFamily(songId));
-  set(songAtomFamily(songId), {
-    ...song,
+export const addToSequenceAtom = atom(null, (_get, set, patternId: string) => {
+  set(updateCurrentSongAtom, (song) => ({
     patternOrder: [...song.patternOrder, patternId],
-    updatedAt: nowIso(),
-  });
+  }));
 });
 
 /** Remove the sequence entry at the given index. */
 export const removeFromSequenceAtom = atom(null, (get, set, index: number) => {
-  const songId = get(currentSongIdAtom);
-  if (!songId) return;
+  let removed = false;
+  set(updateCurrentSongAtom, (song) => {
+    if (song.patternOrder.length === 1) return null; // patternOrder should never be empty
 
-  const song = get(songAtomFamily(songId));
-  if (song.patternOrder.length === 1) return; // patternOrder should never be empty
-
-  const newOrder = [...song.patternOrder];
-  newOrder.splice(index, 1);
-
-  set(songAtomFamily(songId), {
-    ...song,
-    patternOrder: newOrder,
-    updatedAt: nowIso(),
+    const newOrder = [...song.patternOrder];
+    newOrder.splice(index, 1);
+    removed = true;
+    return { patternOrder: newOrder };
   });
+  if (!removed) return;
+
+  // Keep playback pointing at the same entry. If the playing entry itself was
+  // removed, step back one so the entry that took its place plays next.
+  const pos = get(sequencePositionAtom);
+  if (pos >= index) {
+    set(sequencePositionAtom, pos - 1);
+  }
 });
 
 /** Insert a duplicate of the entry at the given index right after it. */
 export const duplicateInSequenceAtom = atom(null, (get, set, index: number) => {
-  const songId = get(currentSongIdAtom);
-  if (!songId) return;
+  let inserted = false;
+  set(updateCurrentSongAtom, (song) => {
+    const patternId = song.patternOrder[index];
+    if (!patternId) return null;
 
-  const song = get(songAtomFamily(songId));
-  const patternId = song.patternOrder[index];
-  if (!patternId) return;
-
-  const newOrder = [...song.patternOrder];
-  newOrder.splice(index + 1, 0, patternId);
-
-  set(songAtomFamily(songId), {
-    ...song,
-    patternOrder: newOrder,
-    updatedAt: nowIso(),
+    const newOrder = [...song.patternOrder];
+    newOrder.splice(index + 1, 0, patternId);
+    inserted = true;
+    return { patternOrder: newOrder };
   });
+  if (!inserted) return;
+
+  const pos = get(sequencePositionAtom);
+  if (pos > index) {
+    set(sequencePositionAtom, pos + 1);
+  }
 });
 
 /** Swap a sequence entry with its adjacent neighbor. */
 export const swapInSequenceAtom = atom(
   null,
   (
-    get,
+    _get,
     set,
     { index, direction }: { index: number; direction: "up" | "down" },
   ) => {
-    const songId = get(currentSongIdAtom);
-    if (!songId) return;
-
-    const song = get(songAtomFamily(songId));
     const targetIndex = direction === "up" ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= song.patternOrder.length) return;
-
-    const newOrder = [...song.patternOrder];
-    [newOrder[index], newOrder[targetIndex]] = [
-      newOrder[targetIndex],
-      newOrder[index],
-    ];
-
-    set(songAtomFamily(songId), {
-      ...song,
-      patternOrder: newOrder,
-      updatedAt: nowIso(),
-    });
+    set(moveInSequenceAtom, { from: index, to: targetIndex });
   },
 );
 
-/** Full replacement of patternOrder (for dnd-kit drag end). */
-export const reorderSequenceAtom = atom(
+/** Move a sequence entry from one index to another (for dnd-kit drag end). */
+export const moveInSequenceAtom = atom(
   null,
-  (get, set, newOrder: string[]) => {
-    const songId = get(currentSongIdAtom);
-    if (!songId) return;
+  (get, set, { from, to }: { from: number; to: number }) => {
+    let moved = false;
+    set(updateCurrentSongAtom, (song) => {
+      const length = song.patternOrder.length;
+      if (from === to || from < 0 || to < 0 || from >= length || to >= length) {
+        return null;
+      }
 
-    const song = get(songAtomFamily(songId));
-    set(songAtomFamily(songId), {
-      ...song,
-      patternOrder: newOrder,
-      updatedAt: nowIso(),
+      const newOrder = [...song.patternOrder];
+      const [entry] = newOrder.splice(from, 1);
+      newOrder.splice(to, 0, entry);
+      moved = true;
+      return { patternOrder: newOrder };
     });
+    if (!moved) return;
+
+    // Follow the playing entry to its new index
+    const pos = get(sequencePositionAtom);
+    if (pos === from) {
+      set(sequencePositionAtom, to);
+    } else if (from < pos && pos <= to) {
+      set(sequencePositionAtom, pos - 1);
+    } else if (to <= pos && pos < from) {
+      set(sequencePositionAtom, pos + 1);
+    }
   },
 );
 
@@ -136,6 +137,6 @@ export function useSwapInSequence() {
   return useSetAtom(swapInSequenceAtom);
 }
 
-export function useReorderSequence() {
-  return useSetAtom(reorderSequenceAtom);
+export function useMoveInSequence() {
+  return useSetAtom(moveInSequenceAtom);
 }

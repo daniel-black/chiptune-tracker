@@ -72,7 +72,9 @@ export function VolumeInput({ volume, setVolume, field }: VolumeInputProps) {
       return;
     }
 
-    setVolume("--");
+    if (volume !== "--") {
+      setVolume("--");
+    }
     setLocalVolume("--");
   }
 

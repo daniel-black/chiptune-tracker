@@ -3,7 +3,7 @@ import { autoScrollAtom } from "./auto-scroll";
 import { playheadAtom } from "./playhead";
 import { playbackRangeAtom } from "./range";
 
-type PlaybackStatus = "stopped" | "playing" | "paused";
+export type PlaybackStatus = "stopped" | "playing" | "paused";
 
 export const playbackStatusAtom = atom<PlaybackStatus>("stopped");
 
