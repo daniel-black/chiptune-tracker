@@ -4,6 +4,7 @@ import { atomWithStorage, createJSONStorage } from "jotai/utils";
 import { type Song } from "@/models/song";
 import { createNewSong } from "@/models/factory";
 import { nowIso } from "@/utils/format";
+import type { SharedSong } from "@/lib/share";
 import { resetPlaybackRangeAtom } from "@/features/playback/atoms/range";
 import { stopPlaybackAtom } from "@/features/playback/atoms/playback";
 import { playheadAtom } from "@/features/playback/atoms/playhead";
@@ -130,6 +131,27 @@ const createNewSongAtom = atom(null, (get, set, uuid: string) => {
 
 export function useCreateNewSong() {
   return useSetAtom(createNewSongAtom);
+}
+
+/** Save a song from a share link as a new song owned by this browser */
+const importSharedSongAtom = atom(
+  null,
+  (get, set, shared: SharedSong): string => {
+    const uuid = crypto.randomUUID();
+    const now = nowIso();
+    set(songAtomFamily(uuid), {
+      ...shared,
+      id: uuid,
+      createdAt: now,
+      updatedAt: now,
+    });
+    set(songIndexAtom, [...get(songIndexAtom), uuid]);
+    return uuid;
+  },
+);
+
+export function useImportSharedSong() {
+  return useSetAtom(importSharedSongAtom);
 }
 
 const deleteSongAtom = atom(null, (get, set, uuid: string) => {

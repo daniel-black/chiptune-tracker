@@ -5,6 +5,7 @@ import { MasterVolume } from "@/features/playback/components/master-volume";
 import { Pause } from "@/features/playback/components/pause";
 import { Start } from "@/features/playback/components/start";
 import { Stop } from "@/features/playback/components/stop";
+import { ShareButton } from "./share-button";
 import { UndoRedo } from "./undo-redo";
 
 export function PanelControls() {
@@ -19,6 +20,8 @@ export function PanelControls() {
       <Loop />
 
       <UndoRedo />
+
+      <ShareButton />
 
       <div className="flex-1">
         <MasterVolume />

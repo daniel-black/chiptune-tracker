@@ -6,6 +6,7 @@ import { EditorPage } from "@/pages/editor-page.tsx";
 import { AppWrapper } from "@/components/app-wrapper.tsx";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { NotFoundPage } from "./pages/not-found-page";
+import { SharePage } from "./pages/share-page";
 import { seedDefaultSong } from "./seed-default-song";
 
 seedDefaultSong();
@@ -17,7 +18,8 @@ createRoot(document.getElementById("root")!).render(
         <Route element={<AppWrapper />}>
           <Route index element={<HomePage />} />
           <Route path="/editor/:id" element={<EditorPage />} />
-          <Route path="*" element={<NotFoundPage />} />
+          <Route path="/share" element={<SharePage />} />
+          <Route path="*"element={<NotFoundPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
