@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+# Song pages only exist in the browser that made them, and share links carry
+# their song in the URL hash, so there's nothing for crawlers there.
+Disallow: /editor/
+Disallow: /share
+
+Sitemap: https://chiptunes.studio/sitemap.xml

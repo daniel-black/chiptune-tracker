@@ -2,17 +2,88 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- <link href="/src/index.css" rel="stylesheet" /> -->
-    <title>Chiptunes</title>
-    <!-- <script
-      crossorigin="anonymous"
-      src="//unpkg.com/react-scan/dist/auto.global.js"
-    ></script -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1"
+    />
+
+    <title>Chiptunes – Make 8-bit chiptune music in your browser</title>
+    <meta
+      name="description"
+      content="A free online chiptune tracker. Compose retro 8-bit music with pulse and noise channels, arrange patterns into songs, and share them with a link. No download or sign-up."
+    />
+    <link rel="canonical" href="https://chiptunes.studio/" />
+    <meta name="theme-color" content="#0d0e12" />
+
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Link previews (Open Graph is also read by Slack, Discord, iMessage) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Chiptunes" />
+    <meta property="og:url" content="https://chiptunes.studio/" />
+    <meta
+      property="og:title"
+      content="Chiptunes – Make 8-bit music in your browser"
+    />
+    <meta
+      property="og:description"
+      content="A free online chiptune tracker. Compose retro 8-bit songs and share them with a link. No sign-up."
+    />
+    <meta property="og:image" content="https://chiptunes.studio/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="The Chiptunes tracker grid with colored notes and a playhead"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Chiptunes",
+        "url": "https://chiptunes.studio/",
+        "description": "A free online chiptune tracker for composing retro 8-bit music in the browser.",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Any (web browser)",
+        "browserRequirements": "Requires JavaScript and the Web Audio API",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "image": "https://chiptunes.studio/og-image.png",
+        "featureList": [
+          "Tracker-style grid editor",
+          "Three pulse channels with duty cycle control",
+          "Noise channel for drums and percussion",
+          "Pattern arrangement",
+          "Share songs with a link",
+          "No account needed"
+        ]
+      }
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!--
+        Shown until the app loads (React replaces it), and readable by
+        crawlers that don't run JavaScript.
+      -->
+      <main
+        style="max-width: 40rem; margin: 5rem auto; padding: 0 1rem; font-family: system-ui, sans-serif; line-height: 1.6"
+      >
+        <h1>Chiptunes</h1>
+        <p>
+          Chiptunes is a free chiptune tracker that runs in your browser. Write
+          retro 8-bit music on three pulse channels and a noise channel,
+          arrange patterns into full songs, and share what you make with a
+          single link. There's nothing to download and no account to create.
+        </p>
+        <noscript>
+          <p>Chiptunes needs JavaScript and the Web Audio API to run.</p>
+        </noscript>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
