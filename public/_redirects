@@ -1,0 +1,8 @@
+# The app handles these routes in the browser, so serve it for them.
+# Real files (assets, robots.txt, sitemap.xml, images) are served first.
+/editor/*  /index.html  200
+/share     /index.html  200
+
+# Anything else: still load the app so it can show its own "page not found",
+# but with a real 404 status so search engines don't index junk URLs.
+/*         /index.html  404
