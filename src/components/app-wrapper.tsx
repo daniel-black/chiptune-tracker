@@ -5,17 +5,20 @@ import { TooltipProvider } from "./ui/tooltip";
 import { AppSidebar } from "./app-sidebar";
 
 export function AppWrapper() {
-  // The home page is the starting point, so it has no need for a home button
-  // and gets the full width. Every other page keeps the sidebar.
+  // The home page and the share landing page are entry points with their own
+  // calls to action, so they get the full width. Every other page keeps the
+  // sidebar and its home button.
   const { pathname } = useLocation();
-  const showSidebar = pathname !== "/";
+  const showSidebar = pathname !== "/" && pathname !== "/share";
 
   return (
     <JotaiProvider store={store}>
       <TooltipProvider>
         <div className="h-dvh flex">
           {showSidebar && <AppSidebar />}
-          <div className="flex-1">
+          {/* min-w-0 lets pages shrink to the screen instead of growing to
+              fit wide content (like the share page's canvas) */}
+          <div className="flex-1 min-w-0">
             <Outlet />
           </div>
         </div>
