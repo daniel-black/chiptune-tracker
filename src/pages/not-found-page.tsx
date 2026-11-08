@@ -1,4 +1,5 @@
 import { useCreateNewSong } from "@/atoms/song";
+import { usePageMeta } from "@/lib/use-page-meta";
 import { Button } from "@/components/ui/button";
 import { useHotkeys } from "react-hotkeys-hook";
 import { Link, useNavigate } from "react-router";
@@ -6,6 +7,7 @@ import { Link, useNavigate } from "react-router";
 export function NotFoundPage() {
   const navigate = useNavigate();
   const createSong = useCreateNewSong();
+  usePageMeta({ title: "Page not found", noindex: true });
 
   useHotkeys("ctrl+n", handleCreateNewSong);
 

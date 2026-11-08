@@ -1,4 +1,4 @@
-import { rows } from "@/audio/constants";
+import { defaultBpm, rows } from "@/audio/constants";
 import { CHANNEL_CONFIG } from "@/audio/channel-config";
 import { nowIso } from "@/utils/format";
 import type { NoiseCell } from "./noise-cell";
@@ -57,5 +57,6 @@ export function createNewSong(uuid: string): Song {
     updatedAt: now,
     patterns: { [patternId]: pattern },
     patternOrder: [patternId],
+    bpm: defaultBpm,
   };
 }

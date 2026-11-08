@@ -24,7 +24,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { usePatternUsage } from "@/atoms/sequence";
+import { PanelSection } from "./panel-section";
 import {
   CopyIcon,
   EllipsisVerticalIcon,
@@ -50,9 +51,11 @@ export function PatternLibrary() {
   const [renameValue, setRenameValue] = useState("");
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
+  const usage = usePatternUsage();
   const canDelete = patterns.length > 1;
   const deleteTargetName =
-    patterns.find((p) => p.id === deleteTargetId)?.name ?? "";
+    patterns.find((p) => p.id === deleteTargetId)?.name || "Untitled pattern";
+  const deleteTargetUses = deleteTargetId ? (usage[deleteTargetId] ?? 0) : 0;
 
   function startRename(pattern: NamedPattern) {
     setRenamingPatternId(pattern.id);
@@ -79,27 +82,27 @@ export function PatternLibrary() {
   }
 
   return (
-    <div className="p-4 space-y-2">
-      <div className="flex items-center justify-between">
-        <Label className="text-lg font-semibold font-mono">
-          Pattern Library
-        </Label>
+    <PanelSection
+      title="Patterns"
+      action={
         <Button
           variant="ghost"
-          size="icon-sm"
+          size="sm"
+          className="text-muted-foreground"
           onClick={() => createPattern()}
-          aria-label="New pattern"
         >
           <PlusIcon />
+          New
         </Button>
-      </div>
-
-      <ScrollArea className="max-h-40 overflow-auto border">
+      }
+    >
+      <ScrollArea className="max-h-72 overflow-auto rounded-md border bg-secondary/60 p-1">
         <ul className="space-y-0.5">
           {patterns.map((p) => (
             <PatternRow
               key={p.id}
               pattern={p}
+              uses={usage[p.id] ?? 0}
               isSelected={p.id === currentPatternId}
               isRenaming={p.id === renamingPatternId}
               renameValue={renameValue}
@@ -126,8 +129,12 @@ export function PatternLibrary() {
           <DialogHeader>
             <DialogTitle>Delete pattern</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{deleteTargetName}"? This action
-              cannot be undone.
+              Delete "{deleteTargetName}"?
+              {deleteTargetUses > 0 &&
+                ` It will also be removed from the arrangement, where it appears ${
+                  deleteTargetUses === 1 ? "once" : `${deleteTargetUses} times`
+                }.`}{" "}
+              You can undo this with Ctrl + Z.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -140,12 +147,13 @@ export function PatternLibrary() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </PanelSection>
   );
 }
 
 type PatternRowProps = {
   pattern: NamedPattern;
+  uses: number;
   isSelected: boolean;
   isRenaming: boolean;
   renameValue: string;
@@ -161,6 +169,7 @@ type PatternRowProps = {
 
 function PatternRow({
   pattern,
+  uses,
   isSelected,
   isRenaming,
   renameValue,
@@ -187,8 +196,11 @@ function PatternRow({
     <li
       role="button"
       onClick={onSelect}
-      className={`flex items-center gap-1 rounded-md px-2 py-1 cursor-pointer transition-colors ${
-        isSelected ? "bg-accent" : "hover:bg-muted"
+      aria-current={isSelected ? "true" : undefined}
+      className={`flex items-center gap-2 rounded-md px-2 py-1.5 cursor-pointer transition-colors ${
+        isSelected
+          ? "bg-primary/15 text-primary shadow-[inset_2px_0_0_var(--color-primary)]"
+          : "hover:bg-muted"
       }`}
     >
       {isRenaming ? (
@@ -202,11 +214,22 @@ function PatternRow({
           onClick={(e) => e.stopPropagation()}
           maxLength={100}
           spellCheck={false}
-          className="h-5 text-xs py-0"
+          className="h-6 text-sm py-0 px-1.5"
         />
       ) : (
-        <span className="flex-1 truncate text-xs font-mono">
-          {pattern.name}
+        <span className="flex-1 truncate text-sm">
+          {pattern.name || "Untitled pattern"}
+        </span>
+      )}
+
+      {!isRenaming && (
+        <span
+          className={`shrink-0 text-[11px] tabular-nums ${
+            isSelected ? "text-primary/80" : "text-muted-foreground"
+          }`}
+        >
+          {isSelected && "Editing · "}
+          {uses === 0 ? "Unused" : `${uses}×`}
         </span>
       )}
 

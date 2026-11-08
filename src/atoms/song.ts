@@ -4,6 +4,9 @@ import { atomWithStorage, createJSONStorage } from "jotai/utils";
 import { type Song } from "@/models/song";
 import { createNewSong } from "@/models/factory";
 import { nowIso } from "@/utils/format";
+import { defaultBpm } from "@/audio/constants";
+import { demoSongs } from "@/seed-default-song";
+import { track, trackOnce } from "@/lib/analytics";
 import type { SharedSong } from "@/lib/share";
 import { resetPlaybackRangeAtom } from "@/features/playback/atoms/range";
 import { stopPlaybackAtom } from "@/features/playback/atoms/playback";
@@ -11,12 +14,20 @@ import { playheadAtom } from "@/features/playback/atoms/playhead";
 
 const baseSongStorage = createJSONStorage<Song>(() => localStorage);
 
-/** Migrate legacy songs that have `pattern` instead of `patterns`. */
+/**
+ * Bring songs saved by older versions up to the current shape:
+ * - `pattern` (single) became `patterns` + `patternOrder`
+ * - `bpm` moved from a global setting into each song
+ */
 function migrateLegacySong(key: string): void {
   const raw = localStorage.getItem(key);
   if (!raw) return;
   try {
     const parsed = JSON.parse(raw);
+    if (!("bpm" in parsed)) {
+      parsed.bpm = defaultBpm;
+      localStorage.setItem(key, JSON.stringify(parsed));
+    }
     if ("pattern" in parsed && !("patterns" in parsed)) {
       const patternId = crypto.randomUUID();
       const migrated = {
@@ -32,6 +43,7 @@ function migrateLegacySong(key: string): void {
           },
         },
         patternOrder: [patternId],
+        bpm: parsed.bpm,
       };
       localStorage.setItem(key, JSON.stringify(migrated));
     }
@@ -40,15 +52,41 @@ function migrateLegacySong(key: string): void {
   }
 }
 
-const songStorage: typeof baseSongStorage = {
+/**
+ * A failed write (storage full, or blocked by the browser) means work isn't
+ * being saved. Report it once and keep the app running on in-memory state
+ * rather than throwing out of every edit.
+ */
+function reportWriteErrors<T>(
+  storage: ReturnType<typeof createJSONStorage<T>>,
+): typeof storage {
+  return {
+    ...storage,
+    setItem(key, value) {
+      try {
+        storage.setItem(key, value);
+      } catch (err) {
+        console.error(`Couldn't save ${key}`, err);
+        trackOnce("storage-error", {
+          op: "write",
+          reason: err instanceof DOMException ? err.name : "unknown",
+        });
+      }
+    },
+  };
+}
+
+const songStorage = reportWriteErrors<Song>({
   ...baseSongStorage,
   getItem(key, initialValue) {
     migrateLegacySong(key);
     return baseSongStorage.getItem(key, initialValue);
   },
-};
+});
 
-const indexStorage = createJSONStorage<string[]>(() => localStorage);
+const indexStorage = reportWriteErrors(
+  createJSONStorage<string[]>(() => localStorage),
+);
 
 /** Memoized atom family — same uuid always returns the same atom instance. */
 export const songAtomFamily = atomFamily((uuid: string) =>
@@ -122,6 +160,7 @@ export function useCurrentPatternId() {
 
 /** Atom for creating a new, persisted song and adding it to the index */
 const createNewSongAtom = atom(null, (get, set, uuid: string) => {
+  track("song-created");
   set(songAtomFamily(uuid), createNewSong(uuid));
   const index = get(songIndexAtom);
   if (!index.includes(uuid)) {
@@ -141,6 +180,7 @@ const importSharedSongAtom = atom(
     const now = nowIso();
     set(songAtomFamily(uuid), {
       ...shared,
+      source: "shared",
       id: uuid,
       createdAt: now,
       updatedAt: now,
@@ -152,6 +192,46 @@ const importSharedSongAtom = atom(
 
 export function useImportSharedSong() {
   return useSetAtom(importSharedSongAtom);
+}
+
+export type DemoStatus = "missing" | "modified" | "original";
+
+const songContent = (s: Song) =>
+  JSON.stringify([s.name, s.bpm, s.patternOrder, s.patterns]);
+
+/** Whether each demo song is missing or differs from how it shipped */
+export const demoStatusesAtom = atom((get) => {
+  const index = get(songIndexAtom);
+  return demoSongs.map((demo) => {
+    let status: DemoStatus = "missing";
+    if (index.includes(demo.id)) {
+      const song = get(songAtomFamily(demo.id));
+      status = songContent(song) === songContent(demo) ? "original" : "modified";
+    }
+    return { demo, status };
+  });
+});
+
+/** Put a demo song back as it shipped, re-adding it if it was deleted */
+const restoreDemoSongAtom = atom(null, (get, set, demoId: string) => {
+  const demo = demoSongs.find((d) => d.id === demoId);
+  if (!demo) return;
+
+  const status = get(demoStatusesAtom).find((d) => d.demo.id === demoId)?.status;
+  track("demo-restored", { demo: demo.name, status: status ?? "unknown" });
+
+  set(songAtomFamily(demo.id), {
+    ...structuredClone(demo),
+    updatedAt: nowIso(),
+  });
+  const index = get(songIndexAtom);
+  if (!index.includes(demo.id)) {
+    set(songIndexAtom, [...index, demo.id]);
+  }
+});
+
+export function useRestoreDemoSong() {
+  return useSetAtom(restoreDemoSongAtom);
 }
 
 const deleteSongAtom = atom(null, (get, set, uuid: string) => {

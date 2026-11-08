@@ -1,10 +1,13 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import {
+  currentPatternIdAtom,
   currentSongIdAtom,
   songAtomFamily,
   updateCurrentSongAtom,
 } from "./song";
+import { switchPatternAtom } from "./pattern-management";
 import { sequencePositionAtom } from "@/features/playback/atoms/sequence-position";
+import { stopPlaybackAtom } from "@/features/playback/atoms/playback";
 
 export type SequenceEntry = {
   index: number;
@@ -24,6 +27,45 @@ export const sequenceListAtom = atom((get): SequenceEntry[] => {
     name: song.patterns[patternId]?.name ?? "Unknown",
   }));
 });
+
+/**
+ * The arrangement entry the editor is on: the sequence position if it points
+ * at the pattern being edited, otherwise that pattern's first entry. -1 when
+ * the pattern isn't in the arrangement. Playback starts from this entry.
+ */
+export const selectedSequenceIndexAtom = atom((get): number => {
+  const songId = get(currentSongIdAtom);
+  const patternId = get(currentPatternIdAtom);
+  if (!songId || !patternId) return -1;
+
+  const { patternOrder } = get(songAtomFamily(songId));
+  const pos = get(sequencePositionAtom);
+  return patternOrder[pos] === patternId ? pos : patternOrder.indexOf(patternId);
+});
+
+/** How many times each pattern appears in the arrangement */
+export const patternUsageAtom = atom((get): Record<string, number> => {
+  const counts: Record<string, number> = {};
+  for (const entry of get(sequenceListAtom)) {
+    counts[entry.patternId] = (counts[entry.patternId] ?? 0) + 1;
+  }
+  return counts;
+});
+
+/** Open a specific arrangement entry in the editor; playback starts there. */
+export const selectSequenceEntryAtom = atom(
+  null,
+  (get, set, index: number) => {
+    const songId = get(currentSongIdAtom);
+    if (!songId) return;
+    const patternId = get(songAtomFamily(songId)).patternOrder[index];
+    if (!patternId) return;
+
+    if (get(selectedSequenceIndexAtom) !== index) set(stopPlaybackAtom);
+    set(switchPatternAtom, patternId);
+    set(sequencePositionAtom, index);
+  },
+);
 
 /** Append a pattern ID to the end of the sequence. */
 export const addToSequenceAtom = atom(null, (_get, set, patternId: string) => {
@@ -139,4 +181,16 @@ export function useSwapInSequence() {
 
 export function useMoveInSequence() {
   return useSetAtom(moveInSequenceAtom);
+}
+
+export function useSelectedSequenceIndex() {
+  return useAtomValue(selectedSequenceIndexAtom);
+}
+
+export function usePatternUsage() {
+  return useAtomValue(patternUsageAtom);
+}
+
+export function useSelectSequenceEntry() {
+  return useSetAtom(selectSequenceEntryAtom);
 }

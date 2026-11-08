@@ -18,4 +18,8 @@ export type Song = {
   updatedAt: string;
   patterns: Record<string, NamedPattern>;
   patternOrder: Array<string>;
+  /** Tempo in beats per minute (4 rows per beat) */
+  bpm: number;
+  /** Set when the song was opened from a share link */
+  source?: "shared";
 };

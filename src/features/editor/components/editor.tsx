@@ -10,11 +10,13 @@ import { loopAtom } from "@/features/playback/atoms/loop";
 import { autoScrollAtom } from "@/features/playback/atoms/auto-scroll";
 import { playheadAtom } from "@/features/playback/atoms/playhead";
 import { useResetPlaybackRange } from "@/features/playback/atoms/range";
+import { PlayheadOverlay } from "./playhead-overlay";
 export function Editor({ children }: { children: React.ReactNode }) {
   const togglePlayback = useSetAtom(togglePlaybackAtom);
   const stopPlayback = useSetAtom(stopPlaybackAtom);
   const [loop, setLoop] = useAtom(loopAtom);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
   const range = useResetPlaybackRange();
 
   useHotkeys("Space", () => togglePlayback());
@@ -23,8 +25,20 @@ export function Editor({ children }: { children: React.ReactNode }) {
   useHotkeys("r", range.reset);
 
   return (
-    <div ref={scrollRef} className="h-dvh min-w-fit w-fit overflow-auto">
-      <table className="border-separate border-spacing-0">{children}</table>
+    <div
+      ref={scrollRef}
+      className="flex-1 min-h-0 min-w-0 overflow-auto overscroll-none lg:h-dvh"
+    >
+      {/* Grows with the window up to a comfortable width, never below content */}
+      <div
+        ref={gridRef}
+        className="relative w-full min-w-max max-w-[72rem] mx-auto"
+      >
+        <table className="border-separate border-spacing-0 w-full">
+          {children}
+        </table>
+        <PlayheadOverlay containerRef={gridRef} />
+      </div>
       <UserScrollDetector scrollRef={scrollRef} />
       <PlayheadScrollTracker scrollRef={scrollRef} />
     </div>
@@ -107,10 +121,14 @@ function PlayheadScrollTracker({
       return;
     }
 
-    // If the row is above the top edge (e.g. after looping), scroll up
-    const topOverflow = containerRect.top - rowRect.top;
+    // If the row is above the visible area (a new pattern, or looping back to
+    // the start), jump straight there. A smooth scroll back over the whole
+    // pattern leaves the playhead out of sight while it catches up. The
+    // sticky header covers the top of the container, so clear it too.
+    const headerHeight = container.querySelector("thead")?.offsetHeight ?? 0;
+    const topOverflow = containerRect.top + headerHeight - rowRect.top;
     if (topOverflow > 0) {
-      container.scrollBy({ top: -topOverflow, behavior: "smooth" });
+      container.scrollBy({ top: -topOverflow, behavior: "instant" });
     }
   }, [playhead, canStop, autoScroll, scrollRef]);
 

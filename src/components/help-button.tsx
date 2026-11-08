@@ -1,5 +1,6 @@
 import { HelpCircleIcon } from "lucide-react";
-import { useState } from "react";
+import { useHelpOpen } from "@/atoms/help";
+import { FieldGuide } from "@/features/panel/components/field-guide";
 import { useHotkeys } from "react-hotkeys-hook";
 import { Button } from "./ui/button";
 import {
@@ -37,71 +38,82 @@ function HomeHelpContent() {
 function EditorHelpContent() {
   return (
     <>
-      <DialogTitle>Editor Keyboard Shortcuts</DialogTitle>
+      <DialogTitle>Editor guide</DialogTitle>
       <DialogDescription asChild>
-        <div className="space-y-3">
-          <p>Use these shortcuts while editing a song</p>
+        <div className="space-y-4">
+          <p>Shortcuts and what each field in the grid does.</p>
 
-          <p className="font-semibold text-foreground text-sm">Playback</p>
-          <ul className="space-y-2">
-            <li className="flex items-center justify-between">
-              <span>Toggle playback</span>
-              <Kbd>Space</Kbd>
-            </li>
-            <li className="flex items-center justify-between">
-              <span>Stop playback</span>
-              <Kbd>S</Kbd>
-            </li>
-            <li className="flex items-center justify-between">
-              <span>Toggle loop</span>
-              <Kbd>L</Kbd>
-            </li>
-            <li className="flex items-center justify-between">
-              <span>Reset playback range</span>
-              <Kbd>R</Kbd>
-            </li>
-          </ul>
+          <div className="grid gap-x-10 gap-y-6 md:grid-cols-2">
+            <section className="space-y-3">
+              <p className="font-semibold text-foreground text-sm">Playback</p>
+              <ul className="space-y-2">
+                <li className="flex items-center justify-between">
+                  <span>Toggle playback</span>
+                  <Kbd>Space</Kbd>
+                </li>
+                <li className="flex items-center justify-between">
+                  <span>Stop playback</span>
+                  <Kbd>S</Kbd>
+                </li>
+                <li className="flex items-center justify-between">
+                  <span>Toggle loop</span>
+                  <Kbd>L</Kbd>
+                </li>
+                <li className="flex items-center justify-between">
+                  <span>Reset playback range</span>
+                  <Kbd>R</Kbd>
+                </li>
+              </ul>
 
-          <p className="font-semibold text-foreground text-sm">Navigation</p>
-          <ul className="space-y-2">
-            <li className="flex items-center justify-between">
-              <span>Move between rows</span>
-              <span>
-                <Kbd>&uarr;</Kbd> <Kbd>&darr;</Kbd>
-              </span>
-            </li>
-            <li className="flex items-center justify-between">
-              <span>Move between fields</span>
-              <span>
-                <Kbd>&larr;</Kbd> <Kbd>&rarr;</Kbd>
-              </span>
-            </li>
-            <li className="flex items-center justify-between">
-              <span>Deselect field</span>
-              <span>
-                <Kbd>Esc</Kbd>
-              </span>
-            </li>
-          </ul>
+              <p className="font-semibold text-foreground text-sm">
+                Navigation
+              </p>
+              <ul className="space-y-2">
+                <li className="flex items-center justify-between">
+                  <span>Move between rows</span>
+                  <span>
+                    <Kbd>&uarr;</Kbd> <Kbd>&darr;</Kbd>
+                  </span>
+                </li>
+                <li className="flex items-center justify-between">
+                  <span>Move between fields</span>
+                  <span>
+                    <Kbd>&larr;</Kbd> <Kbd>&rarr;</Kbd>
+                  </span>
+                </li>
+                <li className="flex items-center justify-between">
+                  <span>Deselect field</span>
+                  <span>
+                    <Kbd>Esc</Kbd>
+                  </span>
+                </li>
+              </ul>
 
-          <p className="font-semibold text-foreground text-sm">Editing</p>
-          <ul className="space-y-2">
-            <li className="flex items-center justify-between">
-              <span>Note fields auto-advance to the next row</span>
-            </li>
-            <li className="flex items-center justify-between">
-              <span>Undo</span>
-              <span>
-                <Kbd>Ctrl</Kbd> + <Kbd>Z</Kbd>
-              </span>
-            </li>
-            <li className="flex items-center justify-between">
-              <span>Redo</span>
-              <span>
-                <Kbd>Ctrl</Kbd> + <Kbd>Shift</Kbd> + <Kbd>Z</Kbd>
-              </span>
-            </li>
-          </ul>
+              <p className="font-semibold text-foreground text-sm">Editing</p>
+              <ul className="space-y-2">
+                <li className="flex items-center justify-between">
+                  <span>Note fields auto-advance to the next row</span>
+                </li>
+                <li className="flex items-center justify-between">
+                  <span>Undo</span>
+                  <span>
+                    <Kbd>Ctrl</Kbd> + <Kbd>Z</Kbd>
+                  </span>
+                </li>
+                <li className="flex items-center justify-between">
+                  <span>Redo</span>
+                  <span>
+                    <Kbd>Ctrl</Kbd> + <Kbd>Shift</Kbd> + <Kbd>Z</Kbd>
+                  </span>
+                </li>
+              </ul>
+            </section>
+
+            <section className="space-y-3">
+              <p className="font-semibold text-foreground text-sm">Fields</p>
+              <FieldGuide />
+            </section>
+          </div>
         </div>
       </DialogDescription>
     </>
@@ -121,9 +133,9 @@ function DefaultHelpContent() {
 
 export function HelpButton() {
   const { pathname } = useLocation();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useHelpOpen();
 
-  useHotkeys("h", () => setOpen((prev) => !prev), {
+  useHotkeys("h", () => setOpen({ open: !open, via: "hotkey" }), {
     preventDefault: true,
   });
 
@@ -131,7 +143,10 @@ export function HelpButton() {
   const isEditor = pathname.startsWith("/editor");
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => setOpen({ open: next, via: "button" })}
+    >
       <Tooltip>
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
@@ -148,7 +163,11 @@ export function HelpButton() {
           Help <Kbd>H</Kbd>
         </TooltipContent>
       </Tooltip>
-      <DialogContent>
+      <DialogContent
+        className={`max-h-[85dvh] overflow-y-auto ${
+          isEditor ? "sm:max-w-3xl p-6" : ""
+        }`}
+      >
         <DialogHeader>
           {isHome ? (
             <HomeHelpContent />

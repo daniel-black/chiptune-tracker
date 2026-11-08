@@ -9,6 +9,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { buildShareUrl } from "@/lib/share";
+import { track } from "@/lib/analytics";
+import { getSongSource } from "@/lib/song-source";
 
 type Status = "idle" | "copied" | "error";
 
@@ -34,8 +36,13 @@ export function ShareButton() {
     const song = getCurrentSong();
     if (!song) return;
     try {
-      await navigator.clipboard.writeText(await buildShareUrl(song));
+      const url = await buildShareUrl(song);
+      await navigator.clipboard.writeText(url);
       setStatus("copied");
+      track("share-link-created", {
+        urlLength: url.length,
+        source: getSongSource(song),
+      });
     } catch (err) {
       console.error("Failed to copy share link", err);
       setStatus("error");
@@ -51,13 +58,9 @@ export function ShareButton() {
   return (
     <Tooltip open={status !== "idle" || undefined}>
       <TooltipTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handleShare}
-          aria-label="Copy share link"
-        >
+        <Button variant="outline" onClick={handleShare}>
           {status === "copied" ? <CheckIcon /> : <Share2Icon />}
+          {status === "copied" ? "Copied" : "Share"}
         </Button>
       </TooltipTrigger>
       <TooltipContent>{label}</TooltipContent>

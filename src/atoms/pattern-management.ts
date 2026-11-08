@@ -46,7 +46,7 @@ export const createPatternAtom = atom(null, (get, set) => {
   if (!get(currentSongIdAtom)) return;
 
   const patternId = crypto.randomUUID();
-  const pattern = createNamedPattern(patternId, "Untitled Pattern");
+  const pattern = createNamedPattern(patternId, "Untitled pattern");
 
   set(updateCurrentSongAtom, (song) => ({
     patterns: { ...song.patterns, [patternId]: pattern },

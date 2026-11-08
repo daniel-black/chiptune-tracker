@@ -8,9 +8,17 @@ type EditorRowProps = {
 };
 
 export function EditorRow({ rowIndex }: EditorRowProps) {
+  const rowStyle = useRowStyle(rowIndex);
+
   return (
-    <RowWrapper rowIndex={rowIndex}>
-      <td className="border-x border-b font-mono">
+    <tr data-row={rowIndex} className={rowStyle}>
+      {/* Row numbers stay pinned when scrolling sideways. The cell needs an
+          opaque background, so the row highlight is repeated as an overlay. */}
+      <td className="sticky left-0 z-[1] bg-secondary border-b border-r font-mono">
+        <div
+          aria-hidden
+          className={`absolute inset-0 pointer-events-none ${rowStyle}`}
+        />
         <RowControl rowIndex={rowIndex} />
       </td>
       {CHANNEL_CONFIG.map((_, columnIndex) => (
@@ -20,22 +28,6 @@ export function EditorRow({ rowIndex }: EditorRowProps) {
           key={`cell-row-${rowIndex}-col-${columnIndex}`}
         />
       ))}
-    </RowWrapper>
-  );
-}
-
-function RowWrapper({
-  rowIndex,
-  children,
-}: {
-  rowIndex: number;
-  children: React.ReactNode;
-}) {
-  const cn = useRowStyle(rowIndex);
-
-  return (
-    <tr data-row={rowIndex} className={`border-b ${cn} transition-all duration-10 ease-linear`}>
-      {children}
     </tr>
   );
 }

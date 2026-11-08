@@ -1,39 +1,29 @@
 import { defaultRange } from "@/audio/constants";
-import { canStopPlaybackAtom } from "@/features/playback/atoms/playback";
-import { playheadAtom } from "@/features/playback/atoms/playhead";
 import { playbackRangeAtom } from "@/features/playback/atoms/range";
 import { atom, useAtomValue } from "jotai";
 import { atomFamily } from "jotai-family";
 
+// Every 4th row is a beat; the lift is subtle but enough to read rhythm at a glance
+const beatRow = "bg-foreground/[0.045]";
+const plainRow = "bg-transparent";
+
 const rowStyleAtomFamily = atomFamily((rowIndex: number) =>
   atom((get) => {
     const range = get(playbackRangeAtom);
-    const striped = rowIndex % 4 === 0;
+    const isBeat = rowIndex % 4 === 0;
+    const base = isBeat ? beatRow : plainRow;
 
-    // transparent if out of range
+    // Dim rows outside a custom playback range
     if (rowIndex < range.start || rowIndex > range.end) {
-      return striped
-        ? "bg-foreground/[0.035] hover:bg-background/50"
-        : "bg-transparent hover:bg-background/50";
-    }
-
-    const showPlayhead = get(canStopPlaybackAtom);
-    const playhead = get(playheadAtom);
-
-    if (rowIndex === playhead && showPlayhead) {
-      return "bg-primary/80 hover:bg-primary/90";
+      return `${base} opacity-45`;
     }
 
     // no range highlight when the whole pattern is selected
     if (range.start === defaultRange.start && range.end === defaultRange.end) {
-      return striped
-        ? "bg-foreground/[0.035] hover:bg-background/50"
-        : "bg-transparent hover:bg-background/50";
+      return base;
     }
 
-    return striped
-      ? "bg-primary/[0.43] hover:bg-primary/[0.53]"
-      : "bg-primary/50 hover:bg-primary/60";
+    return isBeat ? "bg-primary/[0.14]" : "bg-primary/[0.08]";
   }),
 );
 

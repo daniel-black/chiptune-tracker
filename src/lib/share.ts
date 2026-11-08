@@ -1,5 +1,5 @@
 import { CHANNEL_CONFIG } from "@/audio/channel-config";
-import { rows } from "@/audio/constants";
+import { defaultBpm, maxBpm, minBpm, rows } from "@/audio/constants";
 import { isDuty } from "@/audio/characteristics/duty";
 import { isMusicalNote } from "@/audio/characteristics/notes";
 import { isVolumeLevel } from "@/audio/characteristics/volume";
@@ -14,7 +14,7 @@ import type { Cell, NamedPattern, Song } from "@/models/song";
 const VERSION = "v1";
 
 /** The part of a song that travels in a share link */
-export type SharedSong = Pick<Song, "name" | "patterns" | "patternOrder">;
+export type SharedSong = Pick<Song, "name" | "patterns" | "patternOrder" | "bpm">;
 
 /** Cap on decompressed size so a crafted link can't exhaust memory */
 const MAX_DECODED_BYTES = 5_000_000;
@@ -24,6 +24,7 @@ export async function encodeSong(song: Song): Promise<string> {
     name: song.name,
     patterns: song.patterns,
     patternOrder: song.patternOrder,
+    bpm: song.bpm,
   };
   const json = new TextEncoder().encode(JSON.stringify(payload));
   const compressed = await pipe(json, new CompressionStream("deflate-raw"));
@@ -49,7 +50,8 @@ export async function decodeSong(encoded: string): Promise<SharedSong> {
   if (!isSharedSong(parsed)) {
     throw new Error("Share link contains an invalid song");
   }
-  return parsed;
+  // Links made before tempo was saved per song have no bpm
+  return { ...parsed, bpm: parsed.bpm ?? defaultBpm };
 }
 
 export async function buildShareUrl(song: Song): Promise<string> {
@@ -151,8 +153,20 @@ function isNamedPattern(value: unknown, id: string): value is NamedPattern {
   );
 }
 
-function isSharedSong(value: unknown): value is SharedSong {
+function isBpm(value: unknown): boolean {
+  return (
+    typeof value === "number" &&
+    Number.isInteger(value) &&
+    value >= minBpm &&
+    value <= maxBpm
+  );
+}
+
+function isSharedSong(
+  value: unknown,
+): value is Omit<SharedSong, "bpm"> & { bpm?: number } {
   if (!isRecord(value) || typeof value.name !== "string") return false;
+  if (value.bpm !== undefined && !isBpm(value.bpm)) return false;
 
   const { patterns, patternOrder } = value;
   if (!isRecord(patterns) || !Array.isArray(patternOrder)) return false;

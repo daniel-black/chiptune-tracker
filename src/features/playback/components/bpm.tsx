@@ -30,11 +30,11 @@ export function Bpm() {
 
   return (
     <div className="flex gap-1.5 items-center no-wrap">
-      <Label htmlFor="bpm" className="text-sm">
+      <Label htmlFor="bpm" className="text-xs font-medium text-muted-foreground">
         BPM
       </Label>
       <Input
-        className="font-mono tabular-nums w-16"
+        className="font-mono tabular-nums w-16 h-7"
         type="number"
         value={localBpm}
         onChange={handleChange}
