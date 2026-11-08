@@ -18,7 +18,13 @@ export function RateInput({ rate, setRate }: RateInputProps) {
   const [prevRate, setPrevRate] = useState(rate);
   if (prevRate !== rate) {
     setPrevRate(rate);
-    setLocalRate(rate);
+    // Typing "3" saves "03" right away; keep the typed "3" so a second digit
+    // can follow. Only replace the text when the rate changed from elsewhere
+    // (undo, switching patterns).
+    const typedRate = isRateDigits(localRate)
+      ? padNumberTwoDigit(Number(localRate))
+      : localRate;
+    if (typedRate !== rate) setLocalRate(rate);
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {

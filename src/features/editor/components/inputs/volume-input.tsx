@@ -18,7 +18,15 @@ export function VolumeInput({ volume, setVolume, field }: VolumeInputProps) {
   const [prevVolume, setPrevVolume] = useState(volume);
   if (prevVolume !== volume) {
     setPrevVolume(volume);
-    setLocalVolume(volume !== "--" ? padNumberTwoDigit(volume) : volume);
+    // Typing "1" saves volume 1 right away; keep the typed "1" so "15" can
+    // follow. Only replace the text when the volume changed from elsewhere
+    // (undo, switching patterns).
+    const typedVolume = /^\d{1,2}$/.test(localVolume)
+      ? Number(localVolume)
+      : localVolume;
+    if (typedVolume !== volume) {
+      setLocalVolume(volume !== "--" ? padNumberTwoDigit(volume) : volume);
+    }
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
