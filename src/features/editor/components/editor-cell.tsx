@@ -18,8 +18,8 @@ export function EditorCell({ rowIndex, columnIndex }: EditorCellProps) {
 
   return (
     <CellContext.Provider value={cellPosition}>
-      <td className="border-x border-b w-44 p-1 hover:bg-primary/30">
-        <div className="flex justify-around">
+      <td className="border-r border-b px-3 hover:bg-foreground/[0.04]">
+        <div className="flex justify-center gap-2.5 2xl:gap-4">
           {kind === "noise" ? (
             <NoiseCell rowIndex={rowIndex} columnIndex={columnIndex} />
           ) : (

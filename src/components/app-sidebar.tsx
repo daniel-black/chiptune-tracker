@@ -5,9 +5,9 @@ import { HelpButton } from "./help-button";
 
 export function AppSidebar() {
   return (
-    <div className="border-r flex flex-col justify-between gap-3 bg-primary-foreground/5">
-      <Link to="/">
-        <Button size="icon-lg" className="h-10 w-10">
+    <div className="w-11 border-r flex flex-col items-center justify-between py-1.5 gap-3 bg-background">
+      <Link to="/" aria-label="Home">
+        <Button size="icon-lg" variant="ghost" className="text-muted-foreground hover:text-primary">
           <HouseIcon />
         </Button>
       </Link>

@@ -21,8 +21,8 @@ export function Loop() {
             checked={loop}
             onCheckedChange={() => setLoop(!loop)}
           />
-          <Label htmlFor="loop" className="text-sm">
-            LOOP
+          <Label htmlFor="loop" className="text-xs font-medium text-muted-foreground">
+            Loop
           </Label>
         </div>
       </TooltipTrigger>

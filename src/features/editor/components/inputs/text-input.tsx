@@ -20,6 +20,13 @@ interface TextInputProps extends Omit<
   field: number;
 }
 
+const fieldColors: Record<NonNullable<EditorInputType>, string> = {
+  note: "text-field-note font-medium",
+  duty: "text-field-duty",
+  volume: "text-field-volume",
+  rate: "text-field-rate",
+};
+
 export function TextInput({
   maxLength,
   editorInputType,
@@ -33,8 +40,12 @@ export function TextInput({
 
   const isContinue = inputProps.value === "---" || inputProps.value === "--";
 
-  const width = maxLength === 3 ? "w-8" : "w-6";
-  const textColor = isContinue ? "text-foreground/40" : "text-foreground";
+  const width = maxLength === 3 ? "w-[3.5ch]" : "w-[2.5ch]";
+  const textColor = isContinue
+    ? "text-field-empty"
+    : editorInputType
+      ? fieldColors[editorInputType]
+      : "text-foreground";
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     switch (e.key) {
@@ -71,7 +82,7 @@ export function TextInput({
       data-field={field}
       onFocus={() => setFocusedInputType(editorInputType)}
       onKeyDown={handleKeyDown}
-      className={`${width} ${textColor} text-sm text-center font-mono outline-none selection:bg-transparent focus:ring-2 focus:ring-primary`}
+      className={`${width} ${textColor} h-6 text-[13px] text-center font-mono outline-none selection:bg-transparent focus:bg-primary/15 focus:ring-1 focus:ring-primary focus:text-foreground`}
       type="text"
       maxLength={maxLength}
       spellCheck={false}

@@ -17,8 +17,9 @@ export function Stop() {
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          variant="destructive"
+          variant="secondary"
           size="icon"
+          className="enabled:text-destructive"
           disabled={!canStop}
           onClick={stopPlayback}
         >

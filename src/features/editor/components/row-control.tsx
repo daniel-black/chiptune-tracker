@@ -16,6 +16,13 @@ import {
 import { padNumberTwoDigit } from "@/utils/format";
 import { useSetAtom } from "jotai";
 
+/** Bar starts (every 16 rows) get the accent, beats (every 4) stand out a bit */
+function rowNumberColor(rowIndex: number) {
+  if (rowIndex % 16 === 0) return "text-primary";
+  if (rowIndex % 4 === 0) return "text-foreground/80";
+  return "text-muted-foreground/60";
+}
+
 export function RowControl({ rowIndex }: { rowIndex: number }) {
   const canBeStart = useCanRowBeStartOfRange(rowIndex);
   const setStartOfPlaybackRange = useSetAtom(setStartOfPlaybackRangeAtom);
@@ -27,8 +34,8 @@ export function RowControl({ rowIndex }: { rowIndex: number }) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="outline"
-          className="border-none w-10 focus-visible:ring-0 hover:cursor-context-menu"
+          variant="ghost"
+          className={`relative h-6 w-10 font-mono text-[11px] tabular-nums focus-visible:ring-0 hover:cursor-context-menu ${rowNumberColor(rowIndex)}`}
         >
           {padNumberTwoDigit(rowIndex)}
         </Button>
