@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { isDuty } from "@/audio/characteristics/duty";
 import { TextInput } from "./text-input";
 import type { PulseCell } from "@/models/pulse-cell";
@@ -28,13 +28,26 @@ export function DutyInput({ duty, setDuty }: DutyInputProps) {
     setLocalDuty(duty);
   }
 
+  // The value a shortcut key just entered, so typing it out in full ("2"
+  // then "5" for 25) doesn't let the "5" trigger the 50% shortcut
+  const justEntered = useRef<string | null>(null);
+
   // Key down can handle the setting logic for Duty input since values are few and distinct
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    const completesShortcut =
+      justEntered.current === localDuty && e.key === localDuty[1];
+    justEntered.current = null;
+    if (completesShortcut) {
+      e.preventDefault();
+      return;
+    }
+
     if (e.key.length === 1 && isValidFirstLetterForDuty(e.key)) {
       const dutyFromShortCut = dutyShortCutMap.get(e.key);
       if (dutyFromShortCut) {
         setDuty(dutyFromShortCut);
         setLocalDuty(dutyFromShortCut);
+        justEntered.current = dutyFromShortCut;
         return;
       }
     }
@@ -49,11 +62,12 @@ export function DutyInput({ duty, setDuty }: DutyInputProps) {
 
   // Since we can easily shortcut to the right value in keyDown, we don't need onChange to do work
   // Keeping onChange around though so that I don't get console errors about an uncontrolled component etc.
-  function handleChange(_: React.ChangeEvent<HTMLInputElement>) {
+  function handleChange() {
     // does nothing
   }
 
   function handleBlur() {
+    justEntered.current = null;
     if (!isDuty(localDuty)) {
       // Only write when the stored value actually changes (e.g. arrowing through "--" cells)
       if (duty !== "--") {

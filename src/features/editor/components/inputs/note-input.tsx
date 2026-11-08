@@ -44,7 +44,7 @@ export function NoteInput({ note, setNote }: NoteInputProps) {
       return;
     }
 
-    if (e.key === "o") {
+    if (e.key.toLowerCase() === "o") {
       setNote("OFF");
       setLocalNote("OFF");
       advanceDown();
@@ -104,7 +104,8 @@ export function NoteInput({ note, setNote }: NoteInputProps) {
 
   function handleBlur() {
     if (localNote.length !== 3) {
-      setNote("---");
+      // Only write when it changes, or undo gets a step that does nothing
+      if (note !== "---") setNote("---");
       setLocalNote("---");
     }
   }

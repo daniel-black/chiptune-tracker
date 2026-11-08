@@ -80,7 +80,10 @@ export function TextInput({
       data-row={row}
       data-col={column}
       data-field={field}
-      onFocus={() => setFocusedInputType(editorInputType)}
+      onFocus={(e) => {
+        setFocusedInputType(editorInputType);
+        onFocus?.(e);
+      }}
       onKeyDown={handleKeyDown}
       className={`${width} ${textColor} h-6 text-[13px] text-center font-mono outline-none selection:bg-transparent focus:bg-primary/15 focus:ring-1 focus:ring-primary focus:text-foreground`}
       type="text"

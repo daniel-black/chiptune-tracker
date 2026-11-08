@@ -37,17 +37,16 @@ export function VolumeInput({ volume, setVolume, field }: VolumeInputProps) {
       return;
     }
 
-    if (localVolume === "--") {
-      if (e.key === "Backspace") {
-        setLocalVolume(""); // fully clear local input when backspacing a continue
-        return;
-      }
+    if (localVolume === "--" && e.key === "Backspace") {
+      setLocalVolume(""); // fully clear local input when backspacing a continue
+      return;
+    }
 
-      if (isVolumeLevel(parseInt(e.key, 10))) {
-        // clear the input so that onChange can write w/o running into maxLength restriction
-        setLocalVolume("");
-        return;
-      }
+    // Typing over a complete value ("--" or "08") starts a new one, like the
+    // note and duty fields. Clearing first gets past the 2-character limit.
+    if (localVolume.length === 2 && /^\d$/.test(e.key)) {
+      setLocalVolume("");
+      return;
     }
   }
 

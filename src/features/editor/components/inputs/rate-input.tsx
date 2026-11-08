@@ -34,8 +34,14 @@ export function RateInput({ rate, setRate }: RateInputProps) {
       return;
     }
 
-    if (localRate === "--" && (e.key === "Backspace" || /\d/.test(e.key))) {
-      // clear the whole input
+    if (localRate === "--" && e.key === "Backspace") {
+      setLocalRate(""); // clear the whole input
+      return;
+    }
+
+    // Typing over a complete value ("--" or "05") starts a new one, like the
+    // note and duty fields. Clearing first gets past the 2-character limit.
+    if (localRate.length === 2 && /^\d$/.test(e.key)) {
       setLocalRate("");
       return;
     }
