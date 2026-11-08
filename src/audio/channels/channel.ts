@@ -5,7 +5,7 @@ export abstract class Channel {
   protected readonly gain: GainNode;
   protected readonly gate: GainNode;
 
-  constructor(masterGain: GainNode, audioContext: AudioContext) {
+  constructor(masterGain: GainNode, audioContext: BaseAudioContext) {
     this.gain = new GainNode(audioContext, { gain: 0 });
     this.gate = new GainNode(audioContext, { gain: 1 });
 

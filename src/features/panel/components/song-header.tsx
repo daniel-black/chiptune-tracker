@@ -2,6 +2,7 @@ import { useState } from "react";
 import { PencilIcon } from "lucide-react";
 import { useSongName } from "@/atoms/song";
 import { useIsDesktop } from "@/lib/use-media-query";
+import { DownloadButton } from "./download-button";
 import { ShareButton } from "./share-button";
 
 /**
@@ -36,6 +37,7 @@ export function SongHeader({ children }: { children?: React.ReactNode }) {
           className="pointer-events-none absolute right-2 size-3 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-0"
         />
       </label>
+      <DownloadButton />
       <ShareButton />
       {children}
     </div>

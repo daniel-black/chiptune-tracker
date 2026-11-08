@@ -3,7 +3,7 @@ import { Channel, type SynthesizedCell } from "./channel";
 export class NoiseChannel extends Channel {
   private readonly source: AudioBufferSourceNode;
 
-  constructor(audioContext: AudioContext, masterGain: GainNode) {
+  constructor(audioContext: BaseAudioContext, masterGain: GainNode) {
     super(masterGain, audioContext);
 
     const buffer = this.createBuffer(audioContext);
@@ -39,7 +39,7 @@ export class NoiseChannel extends Channel {
     }
   }
 
-  private createBuffer(audioContext: AudioContext): AudioBuffer {
+  private createBuffer(audioContext: BaseAudioContext): AudioBuffer {
     // Create buffer for noise channel
     const bufferSize = audioContext.sampleRate * 2;
     const buffer = audioContext.createBuffer(

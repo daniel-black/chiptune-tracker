@@ -12,7 +12,7 @@ export class PulseChannel extends Channel {
   // plays at the last volume even when its own volume is "--".
   private readonly noteGate: GainNode;
 
-  constructor(audioContext: AudioContext, masterGain: GainNode) {
+  constructor(audioContext: BaseAudioContext, masterGain: GainNode) {
     super(masterGain, audioContext);
 
     this.source = new OscillatorNode(audioContext, { type: "sawtooth" });
