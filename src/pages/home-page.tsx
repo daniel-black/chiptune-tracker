@@ -1,5 +1,6 @@
 import { songIndexAtom } from "@/atoms/song";
 import { CreateNewSongButton } from "@/features/home/components/create-new-song-button";
+import { ImportTextButton } from "@/features/home/components/import-text-button";
 import { Separator } from "@/components/ui/separator";
 import { useAtomValue } from "jotai";
 import { SongListItem } from "@/features/home/components/song-list-item";
@@ -26,7 +27,10 @@ export function HomePage() {
             <h3 className="scroll-m-20 text-lg md:text-2xl font-semibold tracking-tight font-mono">
               Songs
             </h3>
-            <CreateNewSongButton />
+            <div className="flex flex-wrap justify-end gap-2">
+              <ImportTextButton />
+              <CreateNewSongButton />
+            </div>
           </div>
           <Separator />
           {songIds.length === 0 ? (

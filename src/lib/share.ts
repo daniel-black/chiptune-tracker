@@ -4,6 +4,7 @@ import { isDuty } from "@/audio/characteristics/duty";
 import { isMusicalNote } from "@/audio/characteristics/notes";
 import { isVolumeLevel } from "@/audio/characteristics/volume";
 import type { Cell, NamedPattern, Song } from "@/models/song";
+import { songFromText, songTextFromLinkPayload } from "./song-text";
 
 /**
  * Songs are shared as `#v1.<base64url(deflate-raw(JSON))>` in the URL hash.
@@ -12,6 +13,9 @@ import type { Cell, NamedPattern, Song } from "@/models/song";
  * decoding old versions so existing links keep working.
  */
 const VERSION = "v1";
+/** Prefix for links that carry the song as readable text */
+const TEXT_VERSION = "t1";
+const MAX_TEXT_LINK_CHARS = 200_000;
 
 /** The part of a song that travels in a share link */
 export type SharedSong = Pick<Song, "name" | "patterns" | "patternOrder" | "bpm">;
@@ -35,6 +39,16 @@ export async function encodeSong(song: Song): Promise<string> {
 export async function decodeSong(encoded: string): Promise<SharedSong> {
   const dot = encoded.indexOf(".");
   const version = dot === -1 ? "" : encoded.slice(0, dot);
+
+  // Readable text links, e.g. written by a chatbot (see song-text.ts)
+  if (version === TEXT_VERSION) {
+    const payload = encoded.slice(dot + 1);
+    if (payload.length > MAX_TEXT_LINK_CHARS) {
+      throw new Error("Share link payload is too large");
+    }
+    return songFromText(songTextFromLinkPayload(payload));
+  }
+
   if (version !== VERSION) {
     throw new Error(`Unsupported share link version: ${version || "none"}`);
   }

@@ -1,0 +1,212 @@
+# Chiptunes
+
+> Chiptunes (https://chiptunes.studio) is a free 8-bit music tracker that runs in the browser. Songs use three pulse-wave channels and one noise channel. This file explains a plain-text song format so you can write songs for people, who then open them in Chiptunes to listen, edit and share.
+
+## Giving the user a song
+
+There are two ways to hand over a song. Offer the link when you can, and always include the text as well.
+
+1. **A link** they can click: `https://chiptunes.studio/share#t1.` followed by the song text with every line break replaced by `;` and every space replaced by `_`. Leave out comment lines. Links open straight into a player with the song. Example:
+
+   https://chiptunes.studio/share#t1.chiptunes_1;title:_Tiny;bpm:_120;pattern_A;00_C-4_50_08;04_E-4_--_--;08_G-4_--_--;12_OFF_--_--;order:_A
+
+2. **The text itself**, in a code block. The user pastes it into Chiptunes using "Import from text" on the home page. This works for songs of any length.
+
+If something is wrong, Chiptunes lists each problem with its line number, and the user may paste those back to you to fix.
+
+## The format
+
+```
+chiptunes 1
+title: Song name
+bpm: 120
+
+pattern Intro
+# row  ch1 (note duty vol) | ch2 | ch3 | noise (rate vol)
+00  C-4 50 08 | .         | C-2 50 08 | 05 08
+04  E-4 -- 06 | G-3 12 03 | .         | 30 07
+
+pattern Chorus
+00  ...
+
+order: Intro, Chorus, Chorus
+```
+
+- `chiptunes 1`: the format version. Put it first.
+- `title:` the song's name. `bpm:` the tempo, a whole number from 60 to 300.
+- `pattern <name>`: starts a pattern. Every pattern is exactly 64 rows, numbered `00` to `63`.
+- Row lines: a row number, then the four channels in order (ch1, ch2, ch3, noise). Only write rows where something changes; rows you leave out change nothing.
+  - Each channel is either `.` (nothing new) or its values: three for a pulse channel (`note duty volume`), two for noise (`rate volume`).
+  - Channels left off the end of a row count as `.`.
+  - The `|` separators are optional and only there for readability.
+- `order:` the patterns to play, comma-separated, in sequence. Patterns can repeat. If you leave it out, every pattern plays once in the order written.
+- A line starting with `#` is a comment.
+
+### Values
+
+- **note:** pitch `A`–`G`, then `-` (natural), `#` (sharp) or `b` (flat), then octave `2`–`7`. For example `C-4`, `F#3`, `Bb5`. `C-4` is middle C. Also `OFF` (silence the channel) and `---` (no change).
+- **duty** (pulse channels only, sets the tone): `12` thin and nasal, `25` bright, `50` full square wave, `75` (sounds like 25), or `--` for no change.
+- **volume:** `00` (silent) to `15` (loudest), or `--` for no change.
+- **rate** (noise only): `00`–`99`, the speed of the noise. `10` is normal speed. Low values rumble, high values hiss. `--` for no change.
+
+## How the sound works (read this before writing)
+
+These rules decide whether a song sounds good:
+
+1. **Time:** 4 rows make one beat, 16 rows make one bar, so a pattern is 4 bars. At 120 bpm one row lasts 1/8 of a second.
+2. **Everything carries over.** A note keeps sounding until the next note or `OFF` on that channel. Volume and duty stay as last set. Each channel starts silent with volume 0, so **the first note on every channel needs a volume**.
+3. **Set the volume at the start of every pattern** you use on a channel, because patterns can be played in any order.
+4. **There are no envelopes.** A note stays at one volume until you change it. For plucky or fading notes, step the volume down over the following rows (for example `08`, then `05`, then `02`).
+5. **Repeating the same pitch doesn't restart the note.** To hear the same pitch twice in a row, change the volume on the second one, or put `OFF` just before it.
+6. **Noise plays all the time** while its volume is above 0, so drums are short bursts that you turn back down:
+   - kick: rate `03`–`05`, volume `08`, then `04`, then `00` over the next rows
+   - snare: rate `25`–`35`, volume `07`, then `04`, then `00`
+   - hi-hat: rate `90`–`99`, volume `02` or `03` for one row, then `00`
+7. **Keep the mix balanced.** All four channels add together. Good levels are a lead around `06`–`08`, harmony `03`–`05`, bass `06`–`08`, and drums `02`–`08`. Avoid going above `10`.
+8. **Give each channel its own job**, for example lead melody, harmony or arpeggios, bass, and drums. Use different duty values so they're easy to tell apart.
+
+## Example
+
+A complete song in C major with a lead, quiet harmony, an octave-jumping bass and a simple drum beat:
+
+```
+chiptunes 1
+title: Sunny Path
+bpm: 140
+
+pattern Verse
+# row  lead (ch1)  | harmony   | bass      | drums
+00  E-5 25 07 | C-4 12 03 | C-2 50 08 | 05 08
+01  .         | .         | --- -- 05 | -- 04
+02  --- -- 06 | .         | C-3 -- 08 | 99 02
+03  .         | .         | --- -- 05 | -- 00
+04  D-5 -- 07 | E-4 -- 03 | C-2 -- 08 | 30 07
+05  .         | .         | --- -- 05 | -- 04
+06  C-5 -- 07 | .         | C-3 -- 08 | -- 00
+07  .         | .         | --- -- 05
+08  D-5 -- 07 | G-4 -- 03 | C-2 -- 08 | 05 08
+09  .         | .         | --- -- 05 | -- 04
+10  --- -- 06 | .         | C-3 -- 08 | 99 02
+11  .         | .         | --- -- 05 | -- 00
+12  E-5 -- 07 | E-4 -- 03 | C-2 -- 08 | 30 07
+13  .         | .         | --- -- 05 | -- 04
+14  --- -- 06 | .         | C-3 -- 08 | -- 00
+15  .         | .         | --- -- 05
+16  C-5 -- 07 | A-3 -- 03 | A-2 -- 08 | 05 08
+17  .         | .         | --- -- 05 | -- 04
+18  --- -- 06 | .         | A-3 -- 08 | 99 02
+19  .         | .         | --- -- 05 | -- 00
+20  --- -- 05 | C-4 -- 03 | A-2 -- 08 | 30 07
+21  .         | .         | --- -- 05 | -- 04
+22  .         | .         | A-3 -- 08 | -- 00
+23  .         | .         | --- -- 05
+24  A-4 -- 07 | E-4 -- 03 | A-2 -- 08 | 05 08
+25  .         | .         | --- -- 05 | -- 04
+26  --- -- 06 | .         | A-3 -- 08 | 99 02
+27  .         | .         | --- -- 05 | -- 00
+28  --- -- 05 | C-4 -- 03 | A-2 -- 08 | 30 07
+29  .         | .         | --- -- 05 | -- 04
+30  .         | .         | A-3 -- 08 | -- 00
+31  .         | .         | --- -- 05
+32  F-5 -- 07 | F-3 -- 03 | F-2 -- 08 | 05 08
+33  .         | .         | --- -- 05 | -- 04
+34  --- -- 06 | .         | F-3 -- 08 | 99 02
+35  .         | .         | --- -- 05 | -- 00
+36  E-5 -- 07 | A-3 -- 03 | F-2 -- 08 | 30 07
+37  .         | .         | --- -- 05 | -- 04
+38  D-5 -- 07 | .         | F-3 -- 08 | -- 00
+39  .         | .         | --- -- 05
+40  C-5 -- 07 | C-4 -- 03 | F-2 -- 08 | 05 08
+41  .         | .         | --- -- 05 | -- 04
+42  --- -- 06 | .         | F-3 -- 08 | 99 02
+43  .         | .         | --- -- 05 | -- 00
+44  --- -- 05 | A-3 -- 03 | F-2 -- 08 | 30 07
+45  .         | .         | --- -- 05 | -- 04
+46  .         | .         | F-3 -- 08 | -- 00
+47  .         | .         | --- -- 05
+48  D-5 -- 07 | G-3 -- 03 | G-2 -- 08 | 05 08
+49  .         | .         | --- -- 05 | -- 04
+50  --- -- 06 | .         | G-3 -- 08 | 99 02
+51  .         | .         | --- -- 05 | -- 00
+52  E-5 -- 07 | B-3 -- 03 | G-2 -- 08 | 30 07
+53  .         | .         | --- -- 05 | -- 04
+54  --- -- 06 | .         | G-3 -- 08 | -- 00
+55  .         | .         | --- -- 05
+56  D-5 -- 07 | D-4 -- 03 | G-2 -- 08 | 05 08
+57  .         | .         | --- -- 05 | -- 04
+58  --- -- 06 | .         | G-3 -- 08 | 99 02
+59  .         | .         | --- -- 05 | -- 00
+60  G-4 -- 07 | B-3 -- 03 | G-2 -- 08 | 30 07
+61  .         | .         | --- -- 05 | -- 04
+62  --- -- 06 | .         | G-3 -- 08 | -- 00
+63  .         | .         | --- -- 05
+
+pattern Turn
+# row  lead (ch1)  | harmony   | bass      | drums
+00  A-5 25 07 | F-3 12 03 | F-2 50 08 | 05 08
+01  .         | .         | --- -- 05 | -- 04
+02  --- -- 06 | .         | F-3 -- 08 | 99 02
+03  .         | .         | --- -- 05 | -- 00
+04  --- -- 05 | A-3 -- 03 | F-2 -- 08 | 30 07
+05  .         | .         | --- -- 05 | -- 04
+06  G-5 -- 07 | .         | F-3 -- 08 | -- 00
+07  .         | .         | --- -- 05
+08  F-5 -- 07 | C-4 -- 03 | F-2 -- 08 | 05 08
+09  .         | .         | --- -- 05 | -- 04
+10  --- -- 06 | .         | F-3 -- 08 | 99 02
+11  .         | .         | --- -- 05 | -- 00
+12  --- -- 05 | A-3 -- 03 | F-2 -- 08 | 30 07
+13  .         | .         | --- -- 05 | -- 04
+14  .         | .         | F-3 -- 08 | -- 00
+15  .         | .         | --- -- 05
+16  G-5 -- 07 | G-3 -- 03 | G-2 -- 08 | 05 08
+17  .         | .         | --- -- 05 | -- 04
+18  --- -- 06 | .         | G-3 -- 08 | 99 02
+19  .         | .         | --- -- 05 | -- 00
+20  --- -- 05 | B-3 -- 03 | G-2 -- 08 | 30 07
+21  .         | .         | --- -- 05 | -- 04
+22  F-5 -- 07 | .         | G-3 -- 08 | -- 00
+23  .         | .         | --- -- 05
+24  D-5 -- 07 | D-4 -- 03 | G-2 -- 08 | 05 08
+25  .         | .         | --- -- 05 | -- 04
+26  --- -- 06 | .         | G-3 -- 08 | 99 02
+27  .         | .         | --- -- 05 | -- 00
+28  --- -- 05 | B-3 -- 03 | G-2 -- 08 | 30 07
+29  .         | .         | --- -- 05 | -- 04
+30  .         | .         | G-3 -- 08 | -- 00
+31  .         | .         | --- -- 05
+32  E-5 -- 07 | E-3 -- 03 | E-2 -- 08 | 05 08
+33  .         | .         | --- -- 05 | -- 04
+34  --- -- 06 | .         | E-3 -- 08 | 99 02
+35  .         | .         | --- -- 05 | -- 00
+36  G-5 -- 07 | G-3 -- 03 | E-2 -- 08 | 30 07
+37  .         | .         | --- -- 05 | -- 04
+38  --- -- 06 | .         | E-3 -- 08 | -- 00
+39  .         | .         | --- -- 05
+40  B-5 -- 07 | B-3 -- 03 | E-2 -- 08 | 05 08
+41  .         | .         | --- -- 05 | -- 04
+42  --- -- 06 | .         | E-3 -- 08 | 99 02
+43  .         | .         | --- -- 05 | -- 00
+44  --- -- 05 | G-3 -- 03 | E-2 -- 08 | 30 07
+45  .         | .         | --- -- 05 | -- 04
+46  .         | .         | E-3 -- 08 | -- 00
+47  .         | .         | --- -- 05
+48  A-5 -- 07 | A-3 -- 03 | A-2 -- 08 | 05 08
+49  .         | .         | --- -- 05 | -- 04
+50  --- -- 06 | .         | A-3 -- 08 | 99 02
+51  .         | .         | --- -- 05 | -- 00
+52  --- -- 05 | C-4 -- 03 | A-2 -- 08 | 30 07
+53  .         | .         | --- -- 05 | -- 04
+54  .         | .         | A-3 -- 08 | -- 00
+55  .         | .         | --- -- 05
+56  G-5 -- 07 | E-4 -- 03 | A-2 -- 08 | 05 08
+57  .         | .         | --- -- 05 | -- 04
+58  --- -- 06 | .         | A-3 -- 08 | 99 02
+59  .         | .         | --- -- 05 | -- 00
+60  D-5 -- 07 | C-4 -- 03 | A-2 -- 08 | 30 07
+61  .         | .         | --- -- 05 | -- 04
+62  --- -- 06 | .         | A-3 -- 08 | -- 00
+63  .         | .         | --- -- 05
+
+order: Verse, Verse, Turn, Verse
+```

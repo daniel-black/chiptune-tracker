@@ -1,6 +1,7 @@
 import { useImportSharedSong } from "@/atoms/song";
 import { Button } from "@/components/ui/button";
 import { decodeSong, type SharedSong } from "@/lib/share";
+import { SongTextError } from "@/lib/song-text";
 import { SongPlayer } from "@/features/share/song-player";
 import type { Song } from "@/models/song";
 import { WandSparklesIcon } from "lucide-react";
@@ -11,12 +12,13 @@ import { Link, useLocation, useNavigate } from "react-router";
 
 /** "#v1.abc" -> "v1". Bounded so a junk link can't send a junk event. */
 function shareVersion(hash: string): string {
-  const match = /^#(v\d{1,3})\./.exec(hash);
+  const match = /^#([vt]\d{1,3})\./.exec(hash);
   return match ? match[1] : "unknown";
 }
 
 /** A coarse category only; error messages could echo link contents */
 function failureReason(err: unknown): string {
+  if (err instanceof SongTextError) return "text-invalid";
   const message = err instanceof Error ? err.message : "";
   if (message.startsWith("Unsupported share link version")) return "version";
   if (message.includes("invalid song")) return "invalid-song";
@@ -35,6 +37,8 @@ export function SharePage() {
   const importSharedSong = useImportSharedSong();
   const [shared, setShared] = useState<SharedSong | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Line-by-line problems when a text link (e.g. from a chatbot) has mistakes
+  const [problems, setProblems] = useState<string[]>([]);
   usePageMeta({ title: shared?.name || "Shared song", noindex: true });
 
   // StrictMode runs effects twice in dev; decode once per link
@@ -59,7 +63,12 @@ export function SharePage() {
         console.error("Failed to open share link", err);
         if (cancelled) return;
         trackOnce("share-decode-failed", { reason: failureReason(err) });
-        setError("This share link is invalid or incomplete.");
+        if (err instanceof SongTextError) {
+          setError("This song's text has some mistakes.");
+          setProblems(err.problems);
+        } else {
+          setError("This share link is invalid or incomplete.");
+        }
       },
     );
 
@@ -93,9 +102,21 @@ export function SharePage() {
           <h1 className="text-xl md:text-4xl font-extrabold tracking-tighter font-mono">
             Couldn't open shared song
           </h1>
-          <p className="text-muted-foreground">
-            {error} Make sure you copied the whole link.
-          </p>
+          {problems.length > 0 ? (
+            <div className="space-y-3 text-left">
+              <p className="text-muted-foreground text-center">
+                {error} If a chatbot wrote it, you can paste these back and
+                ask it to fix them:
+              </p>
+              <pre className="whitespace-pre-wrap rounded-lg border bg-secondary p-4 text-xs leading-relaxed font-mono">
+                {problems.join("\n")}
+              </pre>
+            </div>
+          ) : (
+            <p className="text-muted-foreground">
+              {error} Make sure you copied the whole link.
+            </p>
+          )}
           <Link to="/">
             <Button variant="secondary">Return home</Button>
           </Link>

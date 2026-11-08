@@ -1,8 +1,10 @@
 import { useCallback, useRef, useState } from "react";
 import { useAtomCallback } from "jotai/utils";
 import {
+  CheckIcon,
   DownloadIcon,
   FileAudioIcon,
+  FileTextIcon,
   FileVideoIcon,
   LoaderCircleIcon,
 } from "lucide-react";
@@ -25,6 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { track } from "@/lib/analytics";
 import { getSongSource } from "@/lib/song-source";
+import { songToText } from "@/lib/song-text";
 import type { Song } from "@/models/song";
 
 type Format = "wav" | "m4a" | "mp4";
@@ -81,6 +84,7 @@ function saveFile(blob: Blob, name: string) {
 /** Download the song as audio (WAV or M4A) or a video for social media (MP4) */
 export function DownloadButton() {
   const [rendering, setRendering] = useState<Format | null>(null);
+  const [copied, setCopied] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   // null while unknown: checked the first time the menu opens
@@ -146,6 +150,22 @@ export function DownloadButton() {
     }
   }
 
+  /** The text format, for pasting into a chatbot to extend or remix */
+  async function copyAsText() {
+    const song = getCurrentSong();
+    if (!song) return;
+    try {
+      await navigator.clipboard.writeText(songToText(song));
+      track("export", { format: "text", source: getSongSource(song) });
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Couldn't copy song text", err);
+      track("export-failed", { format: "text" });
+      setError("Couldn't copy to the clipboard. Please try again.");
+    }
+  }
+
   function closeVideoDialog() {
     abortRef.current?.abort();
     setRendering(null);
@@ -164,11 +184,13 @@ export function DownloadButton() {
             {/* Audio exports take a moment; video has its own progress dialog */}
             {rendering !== null && rendering !== "mp4" ? (
               <LoaderCircleIcon className="animate-spin" />
+            ) : copied ? (
+              <CheckIcon />
             ) : (
               <DownloadIcon />
             )}
             {/* Labelled like Share; icon only where the title row is tight */}
-            <span className="hidden sm:inline">Download</span>
+            <span className="hidden sm:inline">{copied ? "Copied" : "Download"}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-72">
@@ -192,6 +214,12 @@ export function DownloadButton() {
             title="Audio for editing"
             detail={`WAV, full quality · ${formatSize(seconds * BYTES_PER_SECOND.wav)}`}
             onSelect={() => exportAs("wav")}
+          />
+          <ExportOption
+            icon={FileTextIcon}
+            title="Text for chatbots"
+            detail="Copies the song as plain text"
+            onSelect={copyAsText}
           />
         </DropdownMenuContent>
       </DropdownMenu>
