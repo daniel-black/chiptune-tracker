@@ -16,13 +16,26 @@ const MAX_GAIN = 8;
 
 export type RenderedSong = { blob: Blob; seconds: number };
 
-/**
- * Renders a song to a mono 16-bit WAV, playing the arrangement once from the
- * top. Uses the same channels as live playback, in an OfflineAudioContext
- * that runs as fast as the CPU allows. Mute buttons, loop and the playback
- * range are deliberately ignored: the export is always the whole song.
- */
+export type RenderedAudio = {
+  /** Normalized mono audio, including the short tail */
+  buffer: AudioBuffer;
+  /** Length of the song itself, without the tail */
+  seconds: number;
+};
+
+/** Renders a song to a mono 16-bit WAV file */
 export async function renderSongToWav(song: Song): Promise<RenderedSong> {
+  const { buffer, seconds } = await renderSongAudio(song);
+  return { blob: encodeWav(buffer.getChannelData(0), SAMPLE_RATE), seconds };
+}
+
+/**
+ * Renders a song's audio, playing the arrangement once from the top. Uses the
+ * same channels as live playback, in an OfflineAudioContext that runs as fast
+ * as the CPU allows. Mute buttons, loop and the playback range are
+ * deliberately ignored: an export is always the whole song.
+ */
+export async function renderSongAudio(song: Song): Promise<RenderedAudio> {
   const secondsPerRow = 60 / (song.bpm * ROWS_PER_BEAT);
   const rows = song.patternOrder.flatMap(
     (id) => song.patterns[id]?.data ?? [],
@@ -52,13 +65,9 @@ export async function renderSongToWav(song: Song): Promise<RenderedSong> {
   channels.forEach((channel) => channel.silence(songSeconds));
 
   const buffer = await ctx.startRendering();
-  const samples = buffer.getChannelData(0);
-  normalize(samples);
+  normalize(buffer.getChannelData(0)); // the array is live, so this edits the buffer
 
-  return {
-    blob: encodeWav(samples, SAMPLE_RATE),
-    seconds: songSeconds,
-  };
+  return { buffer, seconds: songSeconds };
 }
 
 /** Scale so the loudest sample hits PEAK_TARGET (in place) */

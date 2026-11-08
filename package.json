@@ -23,6 +23,7 @@
     "jotai-family": "^1.0.1",
     "jotai-history": "^0.6.0",
     "lucide-react": "^0.563.0",
+    "mediabunny": "^1.65.2",
     "radix-ui": "^1.4.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
